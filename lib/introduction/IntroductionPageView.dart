@@ -27,17 +27,17 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             TextContainer(
               title: AppLocalizations.of(context)!.introduction1_1,
               description: AppLocalizations.of(context)!.introduction1_2,
-              color: Colors.purple,
+              color: new Color.fromARGB(10, 10, 10, 10),
             ),
             TextContainer(
               title: AppLocalizations.of(context)!.introduction2_1,
               description: AppLocalizations.of(context)!.introduction2_2,
-              color: Colors.purpleAccent,
+              color: new Color.fromARGB(152, 152, 115, 253),
             ),
             TextContainer(
               title: AppLocalizations.of(context)!.introduction3_1,
               description: AppLocalizations.of(context)!.introduction3_2,
-              color: Colors.deepPurpleAccent,
+              color: new Color.fromARGB(152, 75, 115, 253),
             ),
           ],
         ),
@@ -87,32 +87,30 @@ class TextContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: SizedBox.expand(
-        child: Container(
-          color: color,
-          child: Center(
-            child: Card(
-              elevation: 20,
-              margin: EdgeInsets.all(20),
-              color: color.withAlpha(600),
-              child: ListTile(
-                title: Padding(
-                    padding: const EdgeInsets.only(bottom: 15.0),
-                    child: Text(
-                      title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 25,
-                      ),
-                    )),
-                subtitle: Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+      child: Container(
+        color: color,
+        child: Center(
+          child: Card(
+            elevation: 20,
+            margin: EdgeInsets.all(20),
+            color: color.withAlpha(600),
+            child: ListTile(
+              title: Padding(
+                  padding: const EdgeInsets.only(bottom: 15.0),
+                  child: Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                    ),
+                  )),
+              subtitle: Text(
+                description,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
                 ),
               ),
             ),
