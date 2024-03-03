@@ -1,0 +1,17 @@
+{
+  "language": "Język polski",
+
+  "@Przyciski": "",
+  "skip": "Pomiń",
+  "next": "Dalej",
+  "done": "Zakończ",
+
+  "@Wprowadzenie": "",
+  "introduction1_1": "Witaj w aplikacji Fit Finder!",
+  "introduction1_2": "Ta aplikacja została stworzona by pomóc Ci znaleźć odpowiednią siłownię",
+  "introduction2_1": "Dlaczego powstała?",
+  "introduction2_2": "Ponieważ brak na rynku aplikacji umożliwiającej sprawdzenie wyposażenia siłowni",
+  "introduction3_1": "Pamiętaj!",
+  "introduction3_2": "Że plany treningowe układane przez aplikacje nigdy nie zastąpią trenera personalnego i układane są pod zdrowego przeciętnego człowieka"
+
+}
