@@ -1,4 +1,4 @@
-import 'package:fitfinder/introduction/IntroductionPageView.dart';
+import 'package:fitfinder/introduction/StartPage.dart';
 import 'package:fitfinder/themes/fitfinder_main_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'FitFinder',
       theme: FitFinderProTheme.buildTheme(),
       supportedLocales: L10n.all,
       locale: const Locale('pl'),
@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate
       ],
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      home: OnBoardingScreen()
+      // home: OnBoardingScreen()
+      home: StartPage()
     );
   }
 }

@@ -12,6 +12,15 @@
   "introduction2_1": "Dlaczego powstała?",
   "introduction2_2": "Ponieważ brak na rynku aplikacji umożliwiającej sprawdzenie wyposażenia siłowni",
   "introduction3_1": "Pamiętaj!",
-  "introduction3_2": "Że plany treningowe układane przez aplikacje nigdy nie zastąpią trenera personalnego i układane są pod zdrowego przeciętnego człowieka"
+  "introduction3_2": "Że plany treningowe układane przez aplikacje nigdy nie zastąpią trenera personalnego i układane są pod zdrowego przeciętnego człowieka",
 
+  "@EkranStartu": "",
+  "startPageSubtitle": "Znajdź dla siebie idealną siłownię!",
+  "emailInput": "Email",
+  "passwordInput": "Hasło",
+  "btnLogin": "Zaloguj",
+  "forgotPassword": "Zapomniałeś hasła?",
+  "googleSignUp": "Zaloguj się przez google",
+  "noAccount": "Nie masz konta?",
+  "registerNow": "Zarejestruj się!"
 }
