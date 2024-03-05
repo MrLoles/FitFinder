@@ -3,6 +3,7 @@ import 'package:fitfinder/themes/fitfinder_main_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'introduction/IntroductionPageView.dart';
 import 'l10n/l10n.dart';
 
 void main() {
@@ -18,7 +19,6 @@ class MyApp extends StatelessWidget {
       title: 'FitFinder',
       theme: FitFinderProTheme.buildTheme(),
       supportedLocales: L10n.all,
-      locale: const Locale('pl'),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -26,8 +26,8 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate
       ],
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      // home: OnBoardingScreen()
-      home: StartPage()
+      home: OnBoardingScreen()
+      // home: StartPage()
     );
   }
 }

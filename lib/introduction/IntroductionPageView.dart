@@ -27,7 +27,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             TextContainer(
               title: AppLocalizations.of(context)!.introduction1_1,
               description: AppLocalizations.of(context)!.introduction1_2,
-              color: new Color.fromARGB(10, 10, 10, 10),
+              color: new Color.fromARGB(152, 220, 115, 10),
             ),
             TextContainer(
               title: AppLocalizations.of(context)!.introduction2_1,
