@@ -1,7 +1,11 @@
+import 'package:fitfinder/general/NavigationAnimation.dart';
+import 'package:fitfinder/introduction/StartPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class OnBoardingScreen extends StatefulWidget {
   @override
@@ -55,7 +59,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 onLastPage?
                 GestureDetector(
                     onTap: () {
-                      print("TODO");
+                      saveOnBoardingAsDone();
+                      Navigator.pushReplacement(
+                        context,
+                        NavigationAnimation.changeScreenWithAnimationRTL(const StartPage()),
+                      );
                     },
                     child: Text(AppLocalizations.of(context)!.done)) :
                 GestureDetector(
@@ -69,6 +77,16 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             ))
       ]),
     );
+  }
+  
+  void saveOnBoardingAsDone() async{
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    print("Set onboarding");
+    setState((){
+      sharedPreferences.setBool("seenOnboarding", true);
+    });
+    print(sharedPreferences.getBool("seenOnboarding"));
   }
 }
 

@@ -1,6 +1,9 @@
+import 'package:fitfinder/introduction/OnBoardingScreen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../general/LoadingSpinner.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
@@ -11,59 +14,59 @@ class StartPage extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-            color: const Color(0xff7c94b6),
-            image: DecorationImage(
-                colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.35), BlendMode.darken),
-                image: AssetImage("assets/images/login-background.png"),
-                fit: BoxFit.cover)),
-        child: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const LogoContainer(),
-            LoginInputField(
-              inputName: localization.emailInput,
-              isPassword: false,
-              icon: const Icon(Icons.mail),
-            ),
-            const SizedBox(height: 10.0),
-            LoginInputField(
-              inputName: localization.passwordInput,
-              isPassword: true,
-              icon: const Icon(Icons.lock),
-            ),
-            const SizedBox(height: 10.0),
-            LoginButton(localization: localization),
-            const ForgotPassword(),
-            const GoogleSignUp(),
-            RichText(
-              text: TextSpan(
-                text: localization.noAccount + " ",
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.white,
-                ),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: localization.registerNow,
-                    style: const TextStyle(
-                      color: Colors.blue,
-                      fontSize: 14.0,
-                      decoration: TextDecoration.underline,
-                      decorationThickness: 1,
-                      decorationColor: Colors.blue
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {print("TEST");},
-                  ),
-                ],
+          decoration: BoxDecoration(
+              color: const Color(0xff7c94b6),
+              image: DecorationImage(
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.35), BlendMode.darken),
+                  image: AssetImage("assets/images/login-background.png"),
+                  fit: BoxFit.cover)),
+          child: Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const LogoContainer(),
+              LoginInputField(
+                inputName: localization.emailInput,
+                isPassword: false,
+                icon: const Icon(Icons.mail),
               ),
-            )
-          ],
-        )),
+              const SizedBox(height: 10.0),
+              LoginInputField(
+                inputName: localization.passwordInput,
+                isPassword: true,
+                icon: const Icon(Icons.lock),
+              ),
+              const SizedBox(height: 10.0),
+              LoginButton(localization: localization),
+              const ForgotPassword(),
+              const GoogleSignUp(),
+              RichText(
+                text: TextSpan(
+                  text: localization.noAccount + " ",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall!
+                      .copyWith(color: Colors.white,
+                  ),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: localization.registerNow,
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontSize: 14.0,
+                        decoration: TextDecoration.underline,
+                        decorationThickness: 1,
+                        decorationColor: Colors.blue
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {print("TEST");},
+                    ),
+                  ],
+                ),
+              )
+            ],
+          )),
       ),
     );
   }
@@ -83,7 +86,9 @@ class LoginButton extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.8,
       child: ElevatedButton(
         onPressed: () {
-          print("TODO");
+          Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context){
+            return OnBoardingScreen();
+          }));
         },
         child: Text(localization.btnLogin), // Tekst na przycisku
       ),
@@ -107,16 +112,16 @@ class GoogleSignUp extends StatelessWidget {
         icon: Image.asset(
           'assets/images/googleButtonIcon.png',
           height: 24.0,
-        ), // Wstawienie ikony Google
+        ),
         label: Text(
           localization.googleSignUp,
-          style: TextStyle(color: Colors.black), // Kolor tekstu przycisku
+          style: TextStyle(color: Colors.black),
         ),
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white, // Kolor tła przycisku
+          foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius:
-                BorderRadius.circular(20.0), // Zaokrąglone krawędzie przycisku
+                BorderRadius.circular(20.0),
           ),
         ),
       ),
@@ -135,7 +140,10 @@ class ForgotPassword extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // Obsługa przycisku "Zapomniałem hasła"
+        // TODO Obsługa przycisku "Zapomniałem hasła" - Backend
+        Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
+          return LoadingSpinner(); //TODO delete - placeholder by podejrzeć utworzony ekran
+        }));
         print("Zapomniałem hasła");
       },
       child: Text(
