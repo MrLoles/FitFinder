@@ -62,7 +62,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       saveOnBoardingAsDone();
                       Navigator.pushReplacement(
                         context,
-                        NavigationAnimation.changeScreenWithAnimationRTL(const StartPage()),
+                        NavigationAnimation.changeScreenWithAnimationRTL(StartPage()),
                       );
                     },
                     child: Text(AppLocalizations.of(context)!.done)) :

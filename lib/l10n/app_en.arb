@@ -57,5 +57,8 @@
   "forgotPassword": "Forgot password?",
   "googleSignUp": "Sign up with google",
   "noAccount": "New user?",
-  "registerNow": "Register now!"
+  "registerNow": "Register now!",
+  "validation": "This field is required",
+  "dialogBoxTitle": "Login failed.",
+  "dialogBoxInfo": "Invalid username or password!"
 }
