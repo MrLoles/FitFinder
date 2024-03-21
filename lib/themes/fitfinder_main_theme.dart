@@ -14,7 +14,7 @@ class FitFinderProTheme {
               fontFamily: GoogleFonts.poppins().fontFamily,
               fontSize: 20,
             )),
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0x00adb5)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         fontFamily: GoogleFonts.poppins().fontFamily);
   }
 }
