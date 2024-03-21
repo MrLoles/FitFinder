@@ -22,5 +22,8 @@
   "forgotPassword": "Zapomniałeś hasła?",
   "googleSignUp": "Zaloguj się przez google",
   "noAccount": "Nie masz konta?",
-  "registerNow": "Zarejestruj się!"
+  "registerNow": "Zarejestruj się!",
+  "validation": "To pole jest wymagane!",
+  "dialogBoxTitle": "Logowanie nieudane.",
+  "dialogBoxInfo": "Nieprawdiłowy login lub hasło!"
 }
