@@ -3,11 +3,39 @@ import 'package:fitfinder/main_page/MainScreen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitfinder/API/Auth.dart';
+
 
 import '../general/LoadingSpinner.dart';
 
-class StartPage extends StatelessWidget {
-  const StartPage({super.key});
+class StartPage extends StatefulWidget {
+  final bool failedLogin;
+
+  StartPage({super.key, this.failedLogin = false});
+
+  @override
+  State<StartPage> createState() => _StartPageState(failedLogin);
+}
+
+class _StartPageState extends State<StartPage> {
+  late TextEditingController loginController;
+  late TextEditingController passwordController;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final bool failedLogin;
+
+  _StartPageState(bool this.failedLogin);
+
+  @override
+  void initState() {
+    super.initState();
+    loginController = new TextEditingController();
+    passwordController = new TextEditingController();
+    if(failedLogin){
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        showLoginFailedDialog(context);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,30 +50,60 @@ class StartPage extends StatelessWidget {
                     Colors.black.withOpacity(0.35), BlendMode.darken),
                 image: AssetImage("assets/images/login-background.png"),
                 fit: BoxFit.cover)),
-        child: Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const LogoContainer(),
-            LoginInputField(
-              inputName: localization.emailInput,
-              isPassword: false,
-              icon: const Icon(Icons.mail),
-            ),
-            const SizedBox(height: 10.0),
-            LoginInputField(
-              inputName: localization.passwordInput,
-              isPassword: true,
-              icon: const Icon(Icons.lock),
-            ),
-            const SizedBox(height: 10.0),
-            LoginButton(localization: localization),
-            const ForgotPassword(),
-            const GoogleSignUp(),
-            RegisterLabel(localization: localization)
-          ],
-        )),
+        child: Form(
+          key: _formKey,
+          child: Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const LogoContainer(),
+              LoginInputField(
+                controller: loginController,
+                inputName: localization.emailInput,
+                isPassword: false,
+                icon: const Icon(Icons.mail),
+              ),
+              const SizedBox(height: 10.0),
+              LoginInputField(
+                controller: passwordController,
+                inputName: localization.passwordInput,
+                isPassword: true,
+                icon: const Icon(Icons.lock),
+              ),
+              const SizedBox(height: 10.0),
+              LoginButton(localization: localization,
+                login: loginController,
+                password: passwordController,
+                formKey: _formKey,),
+              const ForgotPassword(),
+              const GoogleSignUp(),
+              RegisterLabel(localization: localization)
+            ],
+          )),
+        ),
       ),
+    );
+  }
+
+  void showLoginFailedDialog(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(localization.dialogBoxTitle),
+          content: Text(localization.dialogBoxInfo),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -87,12 +145,19 @@ class RegisterLabel extends StatelessWidget {
 }
 
 class LoginButton extends StatelessWidget {
+  final AppLocalizations localization;
+  final TextEditingController login;
+  final TextEditingController password;
+  final GlobalKey<FormState> formKey;
+
   const LoginButton({
     super.key,
     required this.localization,
+    required this.login,
+    required this.password,
+    required this.formKey
   });
 
-  final AppLocalizations localization;
 
   @override
   Widget build(BuildContext context) {
@@ -100,10 +165,30 @@ class LoginButton extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.8,
       child: ElevatedButton(
         onPressed: () {
-          Navigator.push(context,
-              new MaterialPageRoute(builder: (BuildContext context) {
-            return OnBoardingScreen();
-          }));
+          if(formKey.currentState!.validate()){
+            final Future<String> loginFuture = AuthService()
+                .login(login.text, password.text);
+
+            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)
+            {
+              return FutureBuilder<String>(
+                future: loginFuture,
+                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return LoadingSpinner();
+                  }
+                  else{
+                    final token = snapshot.data;
+                    if(token == null || token.isEmpty){
+                      return StartPage(failedLogin: true,);
+                    }else {
+                      return MainScreen();
+                    }
+                  }
+                },
+              );
+            }));
+          }
         },
         child: Text(localization.btnLogin), // Tekst na przycisku
       ),
@@ -181,18 +266,28 @@ class LoginInputField extends StatelessWidget {
   final String inputName;
   final bool isPassword;
   final Icon icon;
+  final TextEditingController controller;
+
 
   const LoginInputField(
       {super.key,
       required this.inputName,
       required this.isPassword,
-      required this.icon});
+      required this.icon,
+      required this.controller});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.8,
-      child: TextField(
+      child: TextFormField(
+        validator: (value) {
+          if (value == null || value.isEmpty){
+            return AppLocalizations.of(context)!.validation;
+          }
+          return null;
+        },
+        controller: controller,
         style: const TextStyle(fontSize: 12.0, color: Colors.white),
         obscureText: isPassword,
         decoration: InputDecoration(
