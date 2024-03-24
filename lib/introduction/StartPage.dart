@@ -1,10 +1,9 @@
-import 'package:fitfinder/introduction/OnBoardingScreen.dart';
+import 'package:fitfinder/API/Auth.dart';
 import 'package:fitfinder/main_page/MainScreen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:fitfinder/API/Auth.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../general/LoadingSpinner.dart';
 
@@ -182,6 +181,7 @@ class LoginButton extends StatelessWidget {
                     if(token == null || token.isEmpty){
                       return StartPage(failedLogin: true,);
                     }else {
+                      saveToken(token);
                       return MainScreen();
                     }
                   }
@@ -193,6 +193,11 @@ class LoginButton extends StatelessWidget {
         child: Text(localization.btnLogin), // Tekst na przycisku
       ),
     );
+  }
+
+  void saveToken(String token) async{
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString("token", token);
   }
 }
 

@@ -25,5 +25,5 @@
   "registerNow": "Zarejestruj się!",
   "validation": "To pole jest wymagane!",
   "dialogBoxTitle": "Logowanie nieudane.",
-  "dialogBoxInfo": "Nieprawdiłowy login lub hasło!"
+  "dialogBoxInfo": "Nieprawidłowy login lub hasło!"
 }
