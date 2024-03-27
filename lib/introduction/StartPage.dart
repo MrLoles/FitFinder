@@ -1,11 +1,14 @@
 import 'package:fitfinder/API/Auth.dart';
+import 'package:fitfinder/introduction/RegisterPage.dart';
 import 'package:fitfinder/main_page/MainScreen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../general/LoadingSpinner.dart';
+import 'common/StartPageCommon.dart';
 
 class StartPage extends StatefulWidget {
   final bool failedLogin;
@@ -17,9 +20,6 @@ class StartPage extends StatefulWidget {
 }
 
 class _StartPageState extends State<StartPage> {
-  late TextEditingController loginController;
-  late TextEditingController passwordController;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final bool failedLogin;
 
   _StartPageState(bool this.failedLogin);
@@ -27,61 +27,11 @@ class _StartPageState extends State<StartPage> {
   @override
   void initState() {
     super.initState();
-    loginController = new TextEditingController();
-    passwordController = new TextEditingController();
     if(failedLogin){
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         showLoginFailedDialog(context);
       });
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final localization = AppLocalizations.of(context)!;
-
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-            color: const Color(0xff7c94b6),
-            image: DecorationImage(
-                colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.35), BlendMode.darken),
-                image: AssetImage("assets/images/login-background.png"),
-                fit: BoxFit.cover)),
-        child: Form(
-          key: _formKey,
-          child: Center(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const LogoContainer(),
-              LoginInputField(
-                controller: loginController,
-                inputName: localization.emailInput,
-                isPassword: false,
-                icon: const Icon(Icons.mail),
-              ),
-              const SizedBox(height: 10.0),
-              LoginInputField(
-                controller: passwordController,
-                inputName: localization.passwordInput,
-                isPassword: true,
-                icon: const Icon(Icons.lock),
-              ),
-              const SizedBox(height: 10.0),
-              LoginButton(localization: localization,
-                login: loginController,
-                password: passwordController,
-                formKey: _formKey,),
-              const ForgotPassword(),
-              const GoogleSignUp(),
-              RegisterLabel(localization: localization)
-            ],
-          )),
-        ),
-      ),
-    );
   }
 
   void showLoginFailedDialog(BuildContext context) {
@@ -105,43 +55,104 @@ class _StartPageState extends State<StartPage> {
       },
     );
   }
-}
-
-class RegisterLabel extends StatelessWidget {
-  const RegisterLabel({
-    super.key,
-    required this.localization,
-  });
-
-  final AppLocalizations localization;
 
   @override
   Widget build(BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        text: localization.noAccount + " ",
-        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-              color: Colors.white,
-            ),
-        children: <TextSpan>[
-          TextSpan(
-            text: localization.registerNow,
-            style: const TextStyle(
-                color: Colors.blue,
-                fontSize: 14.0,
-                decoration: TextDecoration.underline,
-                decorationThickness: 1,
-                decorationColor: Colors.blue),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () {
-                print("TEST");
-              },
+
+    return StartPageScaffold(child: LoginRegisterForm());
+  }
+}
+
+
+class LoginRegisterForm extends StatefulWidget {
+
+  LoginRegisterForm({
+    super.key,
+  });
+
+  @override
+  State<LoginRegisterForm> createState() => _LoginRegisterFormState();
+}
+
+
+class _LoginRegisterFormState extends State<LoginRegisterForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late TextEditingController loginController;
+  late TextEditingController passwordController;
+
+
+  @override
+  void initState() {
+    super.initState();
+    loginController = new TextEditingController();
+    passwordController = new TextEditingController();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
+    return Form(
+      key: _formKey,
+      child: Center(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const LogoContainer(),
+          InputField(
+            controller: loginController,
+            inputName: localization.emailInput,
+            icon: const Icon(Icons.mail),
           ),
+          InputField(
+            controller: passwordController,
+            inputName: localization.passwordInput,
+            isPassword: true,
+            icon: const Icon(Icons.lock),
+          ),
+          LoginButton(localization: localization,
+            login: loginController,
+            password: passwordController,
+            formKey: _formKey,),
+          const ForgotPassword(),
+          const GoogleSignUp(),
+          RegisterLabel(localization: localization)
         ],
-      ),
+      )),
     );
   }
 }
+
+class LogoContainer extends StatelessWidget {
+  const LogoContainer({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
+    return Container(
+        margin: EdgeInsets.only(bottom: 80),
+        child: Column(
+          children: [
+            Image.asset("assets/images/singleLogo.png"),
+            Text("FitFinder",
+                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                  color: Colors.white,
+                )),
+            Text(
+              localization.startPageSubtitle,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge!
+                  .copyWith(color: Colors.white),
+            )
+          ],
+        ));
+  }
+}
+
 
 class LoginButton extends StatelessWidget {
   final AppLocalizations localization;
@@ -174,7 +185,7 @@ class LoginButton extends StatelessWidget {
                 future: loginFuture,
                 builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
                   if (snapshot.connectionState != ConnectionState.done) {
-                    return LoadingSpinner();
+                    return LoadingSpinnerPage();
                   }
                   else{
                     final token = snapshot.data;
@@ -201,6 +212,36 @@ class LoginButton extends StatelessWidget {
   }
 }
 
+
+class ForgotPassword extends StatelessWidget {
+  const ForgotPassword({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
+    return GestureDetector(
+      onTap: () {
+        // TODO Obsługa przycisku "Zapomniałem hasła" - Backend
+        Navigator.push(context,
+            MaterialPageRoute(builder: (BuildContext context) {
+              return LoadingSpinnerPage(); //TODO delete - placeholder by podejrzeć utworzony ekran
+            }));
+        print("Zapomniałem hasła");
+      },
+      child: Text(
+        localization.forgotPassword,
+        style: const TextStyle(
+            color: Colors.white,
+            decoration: TextDecoration.underline,
+            fontSize: 10),
+      ),
+    );
+  }
+}
+
 class GoogleSignUp extends StatelessWidget {
   const GoogleSignUp({
     super.key,
@@ -216,8 +257,8 @@ class GoogleSignUp extends StatelessWidget {
         onPressed: () => {
           Navigator.push(context,
               new MaterialPageRoute(builder: (BuildContext context) {
-            return MainScreen();
-          }))
+                return MainScreen();
+              }))
         },
         icon: Image.asset(
           'assets/images/googleButtonIcon.png',
@@ -238,103 +279,41 @@ class GoogleSignUp extends StatelessWidget {
   }
 }
 
-class ForgotPassword extends StatelessWidget {
-  const ForgotPassword({
+class RegisterLabel extends StatelessWidget {
+  const RegisterLabel({
     super.key,
+    required this.localization,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final localization = AppLocalizations.of(context)!;
-
-    return GestureDetector(
-      onTap: () {
-        // TODO Obsługa przycisku "Zapomniałem hasła" - Backend
-        Navigator.push(context,
-            MaterialPageRoute(builder: (BuildContext context) {
-          return LoadingSpinner(); //TODO delete - placeholder by podejrzeć utworzony ekran
-        }));
-        print("Zapomniałem hasła");
-      },
-      child: Text(
-        localization.forgotPassword,
-        style: const TextStyle(
-            color: Colors.white,
-            decoration: TextDecoration.underline,
-            fontSize: 10),
-      ),
-    );
-  }
-}
-
-class LoginInputField extends StatelessWidget {
-  final String inputName;
-  final bool isPassword;
-  final Icon icon;
-  final TextEditingController controller;
-
-
-  const LoginInputField(
-      {super.key,
-      required this.inputName,
-      required this.isPassword,
-      required this.icon,
-      required this.controller});
+  final AppLocalizations localization;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.8,
-      child: TextFormField(
-        validator: (value) {
-          if (value == null || value.isEmpty){
-            return AppLocalizations.of(context)!.validation;
-          }
-          return null;
-        },
-        controller: controller,
-        style: const TextStyle(fontSize: 12.0, color: Colors.white),
-        obscureText: isPassword,
-        decoration: InputDecoration(
-          prefixIcon: icon,
-          labelText: inputName,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
+    return RichText(
+      text: TextSpan(
+        text: localization.noAccount + " ",
+        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+              color: Colors.white,
+            ),
+        children: <TextSpan>[
+          TextSpan(
+            text: localization.registerNow,
+            style: const TextStyle(
+                color: Colors.blue,
+                fontSize: 14.0,
+                decoration: TextDecoration.underline,
+                decorationThickness: 1,
+                decorationColor: Colors.blue),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => RegisterPage(),
+                    ));
+              },
           ),
-          filled: true,
-          fillColor: Colors.black.withOpacity(0.65),
-        ),
+        ],
       ),
     );
-  }
-}
-
-class LogoContainer extends StatelessWidget {
-  const LogoContainer({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final localization = AppLocalizations.of(context)!;
-
-    return Container(
-        margin: EdgeInsets.only(bottom: 80),
-        child: Column(
-          children: [
-            Image.asset("assets/images/singleLogo.png"),
-            Text("FitFinder",
-                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                      color: Colors.white,
-                    )),
-            Text(
-              localization.startPageSubtitle,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge!
-                  .copyWith(color: Colors.white),
-            )
-          ],
-        ));
   }
 }
