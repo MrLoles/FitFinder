@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:fitfinder/API/model/Token.dart';
 import 'package:fitfinder/API/model/ValidateToken.dart';
-import 'package:flutter/src/widgets/editable_text.dart';
 
 class AuthService {
   static const String _baseUrl = "http://10.0.2.2:8080/user";
-  final _dio = Dio();
   final timeout = 5;
 
   Future<String> login(String username, String password) async {
+    final _dio = Dio();
+
     try {
       Response response = await _dio
           .post(_baseUrl + "/login",
@@ -25,6 +25,8 @@ class AuthService {
   }
 
   Future<bool> validateToken(String token) async {
+    final _dio = Dio();
+
     try {
       Response response = await _dio
           .get(_baseUrl + "/validateToken",
@@ -40,20 +42,21 @@ class AuthService {
     }
   }
 
-  Future<bool> register(String login, String email, String password) async {
+  Future<int> register(String login, String email, String password) async {
+    final _dio = Dio();
+    _dio.options.validateStatus = (status) {
+      return status! >= 200 && status <= 400;
+    };
+
     try {
-      Response response = await _dio
-          .post(_baseUrl + "/register",
-          data: {'username': login, 'email': email, 'password': password}
+      Response response = await _dio.post(
+        _baseUrl + "/register",
+        data: {'username': login, 'email': email, 'password': password},
       ).timeout(Duration(seconds: timeout));
-      //
-      // if (response.statusCode == 200) {
-      //   return "TODO message or widget";
-      // }
-      // else return "";
-      return true;
+
+      return response.statusCode ?? 500;
     } catch (e) {
-      return false;
+      return 500;
     }
   }
 }

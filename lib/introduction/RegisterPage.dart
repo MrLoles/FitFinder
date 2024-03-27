@@ -1,4 +1,4 @@
- import 'package:fitfinder/API/Auth.dart';
+import 'package:fitfinder/API/Auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../general/LoadingSpinner.dart';
@@ -37,7 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset("assets/images/singleLogo.png"),
-            Text("Zarejestruj się",
+            Text(localization.registerTitle,
                 style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                   color: Colors.white,
                 )),
@@ -48,7 +48,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                   children: [
                     InputField(inputName: "Login", icon: const Icon(Icons.accessibility_new), controller: loginController,),
-                    InputField(inputName: "Email", icon: const Icon(Icons.email), controller: emailController,),
+                    EmailInput(inputName: "Email", icon: const Icon(Icons.email), emailController: emailController,),
                     RegisterPassword(inputName: localization.passwordInput, icon: const Icon(Icons.lock), controller: passwordController, passwordController: repeatPasswordController, isPassword: true,),
                     RegisterPassword(inputName: localization.repeatPasswordInput, icon: const Icon(Icons.lock), controller: repeatPasswordController, passwordController: passwordController, isPassword: true,),
                     SizedBox(height: 8,),
@@ -84,11 +84,18 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
       );
 
-      final Future<bool> registerStatus = new AuthService().register(login.text, email.text, password.text);
+      final Future<int> registerStatus = new AuthService().register(login.text, email.text, password.text);
 
       registerStatus.then((result){
         Navigator.of(context).pop();
-        result ? showSuccessDialog(context) : showFailedRegistrationDialog(context);
+        if(result == 201){
+          showSuccessDialog(context);
+        } else if(result == 400){
+          showFailedRegistrationDialog(context, true);
+        } else{
+          showFailedRegistrationDialog(context, false);
+        }
+        // result ? showSuccessDialog(context) : showFailedRegistrationDialog(context);
       });
 
 
@@ -127,7 +134,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  void showFailedRegistrationDialog(BuildContext context) {
+  void showFailedRegistrationDialog(BuildContext context, bool busyEmail) {
     final localization = AppLocalizations.of(context)!;
 
     showDialog(
@@ -135,7 +142,7 @@ class _RegisterPageState extends State<RegisterPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(localization.dialogTitleFailRegistration),
-          content: Text(localization.dialogSubtitleFailRegistration),
+          content: Text(busyEmail ? localization.dialogSubtitleFailRegistrationEmail : localization.dialogSubtitleFailRegistration),
           actions: <Widget>[
             TextButton(
               onPressed: () {

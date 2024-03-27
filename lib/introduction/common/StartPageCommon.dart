@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:email_validator/email_validator.dart';
+
 
 class StartPageScaffold extends StatelessWidget {
   final Widget child;
@@ -126,6 +128,40 @@ class RegisterPassword extends StatelessWidget {
           }
           else if(value != passwordController.text){
             return localization.repeatPasswordValidation;
+          }
+          return null;
+        });
+  }
+}
+
+class EmailInput extends StatelessWidget {
+  final String inputName;
+  final Icon icon;
+  final TextEditingController emailController;
+
+
+  const EmailInput(
+      {super.key,
+        required this.inputName,
+        required this.icon,
+        required this.emailController,});
+
+  @override
+  Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
+    return _NormalInputField(
+        key: key,
+        inputName: inputName,
+        icon: icon,
+        controller: emailController,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return localization.validation;
+          }
+
+          if(!EmailValidator.validate(emailController.text)){
+            return localization.emailValidation;
           }
           return null;
         });

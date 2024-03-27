@@ -29,13 +29,16 @@
   "dialogBoxInfo": "Nieprawidłowy login lub hasło!",
 
   "@EkranRejestracji": "",
+  "registerTitle": "Rejestracja",
   "registerButton": "Zarejestruj się",
   "repeatPasswordValidation": "Podane hasła nie są jednakowe",
+  "emailValidation": "Wprowadź poprawny adres email",
   "repeatPasswordInput": "Powtórz hasło",
   "dialogTitleSuccessRegistration": "Pomyślna rejestracja",
   "dialogDescriptionpt1SuccessRegistration": "Twoje konto zostało pomyślnie zarejestrowane.",
   "dialogDescriptionpt2SuccessRegistration": "Mail potwierdzający rejestrację został wysłany na podany adres email.",
   "dialogTitleFailRegistration": "Rejestracja nieudana",
-  "dialogSubtitleFailRegistration": "Nie udało się zarejestrować. Spróbuj ponownie.",
+  "dialogSubtitleFailRegistration": "Rejestracja nieudana. Spróbuj ponownie.",
+  "dialogSubtitleFailRegistrationEmail": "Ten adres email jest już zajęty.",
   "dialogRetryFailRegistration": "Ponów próbę"
 }
