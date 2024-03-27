@@ -2,7 +2,6 @@ import 'package:fitfinder/API/Auth.dart';
 import 'package:fitfinder/introduction/StartPage.dart';
 import 'package:fitfinder/main_page/MainScreen.dart';
 import 'package:fitfinder/themes/fitfinder_main_theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -63,7 +62,7 @@ class StartPageSelector extends StatelessWidget{
       future: new AuthService().validateToken(token),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return LoadingSpinner();
+          return LoadingSpinnerPage();
         }
         else {
           bool tokenLogin = snapshot.data ?? false;

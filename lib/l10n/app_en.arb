@@ -19,6 +19,7 @@
   "@done": {
     "description": "done button"
   },
+  "back": "Back",
 
 
   "@Introduction": "",
@@ -60,5 +61,16 @@
   "registerNow": "Register now!",
   "validation": "This field is required",
   "dialogBoxTitle": "Login failed.",
-  "dialogBoxInfo": "Invalid username or password!"
+  "dialogBoxInfo": "Invalid username or password!",
+
+  "@RegisterPage": "",
+  "registerButton": "Register",
+  "repeatPasswordValidation": "Passwords do not match",
+  "repeatPasswordInput": "Repeat password",
+  "dialogTitleSuccessRegistration": "Successful Registration",
+  "dialogDescriptionpt1SuccessRegistration": "Your account has been successfully registered.",
+  "dialogDescriptionpt2SuccessRegistration": "A registration confirmation email has been sent to the provided email address.",
+  "dialogTitleFailRegistration": "Registration Failed",
+  "dialogSubtitleFailRegistration": "Failed to register. Please try again.",
+  "dialogRetryFailRegistration": "Retry"
 }

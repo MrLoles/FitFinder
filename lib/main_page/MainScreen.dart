@@ -15,7 +15,6 @@ class MainScreen extends StatelessWidget {
   }
 }
 
-//TODO delete obie klasy - placeholder
 class CustomSidebar extends StatelessWidget {
   const CustomSidebar({
     super.key,
