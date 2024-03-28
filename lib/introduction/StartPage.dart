@@ -188,7 +188,7 @@ class LoginButton extends StatelessWidget {
                     return LoadingSpinnerPage();
                   }
                   else{
-                    final token = snapshot.data;
+                    final token = snapshot.data; //TODO co jak timeout
                     if(token == null || token.isEmpty){
                       return StartPage(failedLogin: true,);
                     }else {
