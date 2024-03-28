@@ -3,7 +3,7 @@ import 'package:fitfinder/API/model/Token.dart';
 import 'package:fitfinder/API/model/ValidateToken.dart';
 
 class AuthService {
-  static const String _baseUrl = "http://10.0.2.2:8080/user";
+  static const String _baseUrl = "http://173.212.201.249:8080/user";
   final timeout = 5;
 
   Future<String> login(String username, String password) async {
