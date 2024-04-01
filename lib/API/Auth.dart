@@ -6,13 +6,20 @@ class AuthService {
   static const String _baseUrl = "http://173.212.201.249:8080/user";
   final timeout = 5;
 
-  Future<String> login(String username, String password) async {
+  Future<String> login(String usernameOrEmail, String password) async {
     final _dio = Dio();
+    var data;
+
+    if(usernameOrEmail.contains("@")){
+      data = {'email': usernameOrEmail, 'password': password};
+    }else{
+      data = {'username': usernameOrEmail, 'password': password};
+    }
 
     try {
       Response response = await _dio
           .post(_baseUrl + "/login",
-          data: {'username': username, 'password': password}
+          data: data
       ).timeout(Duration(seconds: timeout));
 
       if (response.statusCode == 200) {

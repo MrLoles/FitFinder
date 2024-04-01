@@ -52,7 +52,7 @@
   "@StartPage":"",
 
   "startPageSubtitle":"We'll help you find the best gym for you!",
-  "emailInput": "Email",
+  "emailInput": "Email/Username",
   "passwordInput": "Password",
   "btnLogin": "Login",
   "forgotPassword": "Forgot password?",

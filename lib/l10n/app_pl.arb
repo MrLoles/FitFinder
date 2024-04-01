@@ -17,7 +17,7 @@
 
   "@EkranStartu": "",
   "startPageSubtitle": "Znajdź dla siebie idealną siłownię!",
-  "emailInput": "Email",
+  "emailInput": "Email/Nazwa użytkownika",
   "passwordInput": "Hasło",
   "btnLogin": "Zaloguj",
   "forgotPassword": "Zapomniałeś hasła?",
