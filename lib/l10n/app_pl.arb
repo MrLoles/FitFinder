@@ -40,5 +40,20 @@
   "dialogTitleFailRegistration": "Rejestracja nieudana",
   "dialogSubtitleFailRegistration": "Rejestracja nieudana. Spróbuj ponownie.",
   "dialogSubtitleFailRegistrationEmail": "Ten adres email jest już zajęty.",
-  "dialogRetryFailRegistration": "Ponów próbę"
+  "dialogRetryFailRegistration": "Ponów próbę",
+
+  "@ForgotPasswordPage": "",
+  "forgotPasswordTitle": "todo",
+  "forgotPasswordDescription1": "Nie pamiętasz hasła?",
+  "forgotPasswordDescription2": "Możesz je łatwo odzyskać wpisując poniżej Twój adres email.",
+  "forgotPasswordDescription3": "Link do odzyskania hasła zostanie wysłany na podany adres.",
+  "forgotPasswordButtonSend": "Odzyskaj hasło",
+
+  "forgotPasswordDialogTitleSuccess": "Sukces!",
+  "forgotPasswordDialogDescription1Success": "Jeżeli podany adres jest przypisany do konta, zostanie na niego wysłany link",
+  "forgotPasswordDialogDescription2Success": "Sprawdź swoją skrzynkę pocztową i postępuj zgodnie z instrukcjami zawartymi w e-mailu, aby zresetować hasło.",
+
+  "forgotPasswordDialogTitleFailed": "Ups, coś poszło nie tak :(",
+  "forgotPasswordDialogDescription1Fail": "Wystąpił błąd podczas odzyskiwania hasła.",
+  "forgotPasswordDialogDescription2Fail": "Proszę, spróbuj ponownie później"
 }

@@ -59,4 +59,22 @@ class AuthService {
       return 500;
     }
   }
+
+  Future<int> forgotPassword(String email) async {
+    final _dio = Dio();
+    _dio.options.validateStatus = (status) {
+      return status! >= 200 && status <= 499;
+    };
+
+    try {
+      Response response = await _dio.post(
+        _baseUrl + "/resetPasswordChallenge",
+        data: {'email': email},
+      ).timeout(Duration(seconds: timeout));
+
+      return response.statusCode ?? 500;
+    } catch (e) {
+      return 500;
+    }
+  }
 }
