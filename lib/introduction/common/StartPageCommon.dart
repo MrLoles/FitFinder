@@ -167,3 +167,26 @@ class EmailInput extends StatelessWidget {
         });
   }
 }
+
+class ButtonBack extends StatelessWidget{
+
+  @override
+  Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
+    return TextButton(onPressed: ()=>Navigator.of(context).pop(),
+        style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size(50, 30),
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            alignment: Alignment.centerLeft),
+        child: Text(localization.back,
+          style: Theme.of(context).textTheme.bodyMedium!
+              .copyWith(
+              decoration: TextDecoration.underline,
+              decorationThickness: 1,
+              decorationColor: Colors.white,
+              color: Colors.white),));
+  }
+
+}

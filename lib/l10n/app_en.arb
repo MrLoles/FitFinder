@@ -75,5 +75,20 @@
   "dialogTitleFailRegistration": "Registration Failed",
   "dialogSubtitleFailRegistration": "Failed to register. Please try again.",
   "dialogSubtitleFailRegistrationEmail": "Email is already taken",
-  "dialogRetryFailRegistration": "Retry"
+  "dialogRetryFailRegistration": "Retry",
+
+  "@ForgotPasswordPage": "",
+  "forgotPasswordTitle": "todo",
+  "forgotPasswordDescription1": "Don't remember your password?",
+  "forgotPasswordDescription2": "You can easily recover your password by providing your email address.",
+  "forgotPasswordDescription3": "A link to recover your password will be sent to the provided email address.",
+  "forgotPasswordButtonSend": "Recover password",
+
+  "forgotPasswordDialogTitleSuccess": "Success!",
+  "forgotPasswordDialogDescription1Success": "If the provided address is associated with an account, a link will be sent to it.",
+  "forgotPasswordDialogDescription2Success": "Please check your mailbox and follow the steps provided in the email to reset your password.",
+
+  "forgotPasswordDialogTitleFailed": "Oops, something went wrong :(",
+  "forgotPasswordDialogDescription1Fail": "There was an error during recovering password",
+  "forgotPasswordDialogDescription2Fail": "Please, try again later"
 }
