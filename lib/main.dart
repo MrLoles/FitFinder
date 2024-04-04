@@ -11,33 +11,7 @@ import 'l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(MyApp());
-}
-
-class MyApp2 extends StatelessWidget {
-  final List<String> items = List.generate(10, (index) => 'Element ${index + 1}');
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Lista Przewijana'),
-        ),
-        body: PageView.builder(
-          itemCount: items.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Center(
-              child: Text(
-                items[index],
-                style: TextStyle(fontSize: 24.0),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -84,19 +58,6 @@ class StartPageSelector extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: new AuthService().validateToken(token),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return LoadingSpinnerPage();
-        }
-        else {
-          // bool tokenLogin = snapshot.data ?? false; //TODO uncomment automatyczane logowanie
-          // return tokenLogin ? MainScreen() : StartPage();
-          return StartPage();
-        }
-      },
-    );
     return FutureBuilder<bool>(
       future: new AuthService().validateToken(token),
       builder: (context, snapshot) {
