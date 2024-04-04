@@ -5,6 +5,7 @@
   "skip": "Pomiń",
   "next": "Dalej",
   "done": "Zakończ",
+  "back": "Powrót",
 
   "@Wprowadzenie": "",
   "introduction1_1": "Witaj w aplikacji Fit Finder!",
@@ -22,5 +23,22 @@
   "forgotPassword": "Zapomniałeś hasła?",
   "googleSignUp": "Zaloguj się przez google",
   "noAccount": "Nie masz konta?",
-  "registerNow": "Zarejestruj się!"
+  "registerNow": "Zarejestruj się!",
+  "validation": "To pole jest wymagane!",
+  "dialogBoxTitle": "Logowanie nieudane.",
+  "dialogBoxInfo": "Nieprawidłowy login lub hasło!",
+
+  "@EkranRejestracji": "",
+  "registerTitle": "Rejestracja",
+  "registerButton": "Zarejestruj się",
+  "repeatPasswordValidation": "Podane hasła nie są jednakowe",
+  "emailValidation": "Wprowadź poprawny adres email",
+  "repeatPasswordInput": "Powtórz hasło",
+  "dialogTitleSuccessRegistration": "Pomyślna rejestracja",
+  "dialogDescriptionpt1SuccessRegistration": "Twoje konto zostało pomyślnie zarejestrowane.",
+  "dialogDescriptionpt2SuccessRegistration": "Mail potwierdzający rejestrację został wysłany na podany adres email.",
+  "dialogTitleFailRegistration": "Rejestracja nieudana",
+  "dialogSubtitleFailRegistration": "Rejestracja nieudana. Spróbuj ponownie.",
+  "dialogSubtitleFailRegistrationEmail": "Ten adres email jest już zajęty.",
+  "dialogRetryFailRegistration": "Ponów próbę"
 }

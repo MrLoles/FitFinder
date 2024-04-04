@@ -19,6 +19,7 @@
   "@done": {
     "description": "done button"
   },
+  "back": "Back",
 
 
   "@Introduction": "",
@@ -57,5 +58,22 @@
   "forgotPassword": "Forgot password?",
   "googleSignUp": "Sign up with google",
   "noAccount": "New user?",
-  "registerNow": "Register now!"
+  "registerNow": "Register now!",
+  "validation": "This field is required",
+  "dialogBoxTitle": "Login failed.",
+  "dialogBoxInfo": "Invalid username or password!",
+
+  "@RegisterPage": "",
+  "registerTitle": "Registration",
+  "registerButton": "Register",
+  "repeatPasswordValidation": "Passwords do not match",
+  "emailValidation": "Email is not valid",
+  "repeatPasswordInput": "Repeat password",
+  "dialogTitleSuccessRegistration": "Successful Registration",
+  "dialogDescriptionpt1SuccessRegistration": "Your account has been successfully registered.",
+  "dialogDescriptionpt2SuccessRegistration": "A registration confirmation email has been sent to the provided email address.",
+  "dialogTitleFailRegistration": "Registration Failed",
+  "dialogSubtitleFailRegistration": "Failed to register. Please try again.",
+  "dialogSubtitleFailRegistrationEmail": "Email is already taken",
+  "dialogRetryFailRegistration": "Retry"
 }

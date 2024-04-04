@@ -1,9 +1,11 @@
+import 'package:fitfinder/API/Auth.dart';
 import 'package:fitfinder/introduction/StartPage.dart';
+import 'package:fitfinder/main_page/MainScreen.dart';
 import 'package:fitfinder/themes/fitfinder_main_theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'general/LoadingSpinner.dart';
 import 'introduction/OnBoardingScreen.dart';
 import 'l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,6 +63,10 @@ class MyApp extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.done) {
             final prefs = snapshot.data as SharedPreferences;
             final seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
+            final token = prefs.getString("token") ?? null;
+            if(token != null){
+              return StartPageSelector(token);
+            }
             return seenOnboarding ? StartPage() : OnBoardingScreen();
           } else {
             return CircularProgressIndicator();
@@ -71,28 +77,10 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Start extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _StartState();
-}
+class StartPageSelector extends StatelessWidget{
+  final String token;
 
-class _StartState extends State<Start> {
-  bool firstLaunch = false;
-
-  @override
-  void initState() {
-    loadData();
-    super.initState();
-  }
-
-  void loadData() async {
-    final SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
-
-    setState(() {
-      firstLaunch = sharedPreferences.getBool("seenOnboarding") ?? false;
-    });
-  }
+  StartPageSelector(this.token);
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +97,17 @@ class _StartState extends State<Start> {
         }
       },
     );
-    return firstLaunch ? OnBoardingScreen() : StartPage();
+    return FutureBuilder<bool>(
+      future: new AuthService().validateToken(token),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return LoadingSpinnerPage();
+        }
+        else {
+          bool tokenLogin = snapshot.data ?? false;
+          return tokenLogin ? MainScreen() : StartPage();
+        }
+      },
+    );
   }
 }

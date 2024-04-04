@@ -62,7 +62,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                       saveOnBoardingAsDone();
                       Navigator.pushReplacement(
                         context,
-                        NavigationAnimation.changeScreenWithAnimationRTL(const StartPage()),
+                        NavigationAnimation.changeScreenWithAnimationRTL(StartPage()),
                       );
                     },
                     child: Text(AppLocalizations.of(context)!.done)) :
@@ -82,11 +82,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   void saveOnBoardingAsDone() async{
     final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    print("Set onboarding");
     setState((){
       sharedPreferences.setBool("seenOnboarding", true);
     });
-    print(sharedPreferences.getBool("seenOnboarding"));
   }
 }
 

@@ -254,7 +254,6 @@ class _CardTrainingState extends State<CardTraining> {
   }
 }
 
-//TODO delete obie klasy - placeholder
 class CustomSidebar extends StatelessWidget {
   const CustomSidebar({
     super.key,
