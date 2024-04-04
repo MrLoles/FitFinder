@@ -52,7 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     RegisterPassword(inputName: localization.passwordInput, icon: const Icon(Icons.lock), controller: passwordController, passwordController: repeatPasswordController, isPassword: true,),
                     RegisterPassword(inputName: localization.repeatPasswordInput, icon: const Icon(Icons.lock), controller: repeatPasswordController, passwordController: passwordController, isPassword: true,),
                     SizedBox(height: 8,),
-                    ElevatedButton(onPressed: () => registerUser(_formKey, loginController, emailController, passwordController),
+                    ElevatedButton(onPressed: () => _registerUser(_formKey, loginController, emailController, passwordController),
                         child: Text(localization.registerButton)),
                     TextButton(onPressed: ()=>Navigator.of(context).pop(),
                         style: ButtonStyle(
@@ -74,7 +74,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  void registerUser(GlobalKey<FormState> formKey, TextEditingController login, TextEditingController email, TextEditingController password){
+  void _registerUser(GlobalKey<FormState> formKey, TextEditingController login, TextEditingController email, TextEditingController password){
     if(formKey.currentState!.validate()) {
       showDialog(
         barrierDismissible: false,
@@ -89,20 +89,19 @@ class _RegisterPageState extends State<RegisterPage> {
       registerStatus.then((result){
         Navigator.of(context).pop();
         if(result == 201){
-          showSuccessDialog(context);
+          _showSuccessDialog(context);
         } else if(result == 400){
-          showFailedRegistrationDialog(context, true);
+          _showFailedRegistrationDialog(context, true);
         } else{
-          showFailedRegistrationDialog(context, false);
+          _showFailedRegistrationDialog(context, false);
         }
-        // result ? showSuccessDialog(context) : showFailedRegistrationDialog(context);
       });
 
 
     }
   }
 
-  void showSuccessDialog(BuildContext context) {
+  void _showSuccessDialog(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
 
     showDialog(
@@ -121,7 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.push(context,
+                Navigator.pushReplacement(context,
                     new MaterialPageRoute(builder: (BuildContext context) {
                       return StartPage();
                     }));
@@ -134,7 +133,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  void showFailedRegistrationDialog(BuildContext context, bool busyEmail) {
+  void _showFailedRegistrationDialog(BuildContext context, bool busyEmail) {
     final localization = AppLocalizations.of(context)!;
 
     showDialog(

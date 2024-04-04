@@ -1,4 +1,5 @@
 import 'package:fitfinder/API/Auth.dart';
+import 'package:fitfinder/introduction/ForgotPasswordPage.dart';
 import 'package:fitfinder/introduction/RegisterPage.dart';
 import 'package:fitfinder/main_page/MainScreen.dart';
 import 'package:flutter/gestures.dart';
@@ -175,7 +176,7 @@ class LoginButton extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.8,
       child: ElevatedButton(
         onPressed: () {
-          if(formKey.currentState!.validate()){
+            if(formKey.currentState!.validate()){
             final Future<String> loginFuture = AuthService()
                 .login(login.text, password.text);
 
@@ -188,7 +189,7 @@ class LoginButton extends StatelessWidget {
                     return LoadingSpinnerPage();
                   }
                   else{
-                    final token = snapshot.data;
+                    final token = snapshot.data; //TODO co jak timeout
                     if(token == null || token.isEmpty){
                       return StartPage(failedLogin: true,);
                     }else {
@@ -224,19 +225,17 @@ class ForgotPassword extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        // TODO Obsługa przycisku "Zapomniałem hasła" - Backend
-        Navigator.push(context,
-            MaterialPageRoute(builder: (BuildContext context) {
-              return LoadingSpinnerPage(); //TODO delete - placeholder by podejrzeć utworzony ekran
-            }));
-        print("Zapomniałem hasła");
+        Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => ForgotPasswordPage(),
+            ));
       },
       child: Text(
         localization.forgotPassword,
         style: const TextStyle(
             color: Colors.white,
             decoration: TextDecoration.underline,
-            fontSize: 10),
+            fontSize: 13),
       ),
     );
   }
