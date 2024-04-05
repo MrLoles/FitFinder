@@ -50,6 +50,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                onLastPage?
+                    Text("     ")
+                    :
                 GestureDetector(
                     onTap: () {
                       _controller.jumpToPage(2);
