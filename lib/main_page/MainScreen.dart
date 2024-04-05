@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:table_calendar/table_calendar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../general/Calendar.dart';
+import '../introduction/StartPage.dart';
 
 class MainScreen extends StatelessWidget {
   final List<Map<String, String>> _dataList = [
@@ -359,8 +358,26 @@ class MenuItems extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.message),
           title: const Text("Kontakt"),
+        ),
+        GestureDetector(
+          onTap: () {
+            Navigator.pushReplacement(context,
+                new MaterialPageRoute(builder: (BuildContext context) {
+                  _clearSharedPrefs();
+                  return StartPage();
+                }));
+          },
+          child: ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text("Wyloguj"),
+          ),
         )
       ],
     );
+  }
+
+  void _clearSharedPrefs() async{
+    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove("token");
   }
 }
