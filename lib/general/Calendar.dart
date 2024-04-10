@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarWeek extends StatelessWidget {
@@ -26,6 +27,47 @@ class CalendarWeek extends StatelessWidget {
           weekendStyle: TextStyle(color: Colors.black87),
         ),
       ),
+    );
+  }
+
+  static String getDayOfWeek(int dayIndex) {
+    DateTime date = DateTime.now().subtract(Duration(days: DateTime.now().weekday - dayIndex));
+    return DateFormat('EEEE', 'pl').format(date);
+  }
+}
+
+class MyDropdownWidget extends StatefulWidget {
+  String selectedDay = 'Poniedziałek';
+
+  @override
+  _MyDropdownWidgetState createState() => _MyDropdownWidgetState();
+}
+
+class _MyDropdownWidgetState extends State<MyDropdownWidget> {
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: widget.selectedDay,
+      onChanged: (newValue) {
+        setState(() {
+          widget.selectedDay = newValue!;
+        });
+      },
+      items: <String>[
+        'Poniedziałek',
+        'Wtorek',
+        'Środa',
+        'Czwartek',
+        'Piątek',
+        'Sobota',
+        'Niedziela',
+      ].map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value, style: Theme.of(context).textTheme.bodyLarge,),
+        );
+      }).toList(),
     );
   }
 }
