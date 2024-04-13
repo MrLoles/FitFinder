@@ -1,4 +1,4 @@
-import 'package:fitfinder/API/Auth.dart';
+import 'package:fitfinder/API/auth/Auth.dart';
 import 'package:fitfinder/introduction/StartPage.dart';
 import 'package:fitfinder/main_page/MainScreen.dart';
 import 'package:fitfinder/themes/fitfinder_main_theme.dart';

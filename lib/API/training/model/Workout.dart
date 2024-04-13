@@ -4,9 +4,9 @@ class Exercise {
   String sets;
   String reps;
   String weights;
-  String rest;
+  String? rest;
 
-  Exercise({required this.name, required this.sets, required this.reps, required this.weights, required this.rest});
+  Exercise({required this.name, required this.sets, required this.reps, required this.weights, this.rest});
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
     return Exercise(
@@ -14,8 +14,16 @@ class Exercise {
       sets: json['sets'],
       reps: json['reps'],
       weights: json['weights'],
-      rest:json['rest'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "sets": sets,
+      "reps": reps,
+      "weights": weights,
+    };
   }
 }
 
@@ -35,5 +43,14 @@ class Workout {
       name: json['name'],
       exercises: exercises,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    List<Map<String, dynamic>> exercisesJson = exercises.map((e) => e.toJson()).toList();
+    return {
+      "dayOfWeek": dayOfWeek,
+      "name": name,
+      "exercises": exercisesJson
+    };
   }
 }

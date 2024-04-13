@@ -1,11 +1,15 @@
 import 'dart:convert';
 
-import 'package:fitfinder/API/model/workout/Workout.dart';
+import 'package:fitfinder/API/training/TrainingAPI.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+
+import '../../API/training/model/Workout.dart';
 import '../../general/Calendar.dart';
+import '../../general/LoadingSpinner.dart';
 
 class AddWorkout extends StatelessWidget {
   @override
@@ -25,10 +29,18 @@ class AddWorkout extends StatelessWidget {
   }
 }
 
-class AddWorkoutBody extends StatelessWidget {
+class AddWorkoutBody extends StatefulWidget {
+  @override
+  State<AddWorkoutBody> createState() => _AddWorkoutBodyState();
+}
+
+class _AddWorkoutBodyState extends State<AddWorkoutBody> {
   MyDropdownWidget myDropdownWidget = new MyDropdownWidget();
+
   ExercisesCards exercisesCards = new ExercisesCards();
+
   final _formKey = GlobalKey<FormState>();
+
   TextEditingController trainingNameController = TextEditingController();
 
   @override
@@ -72,7 +84,7 @@ class AddWorkoutBody extends StatelessWidget {
                         suffixStyle: TextStyle(color: Colors.grey), // Styl dla licznika znaków
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        if (value == null || value.isEmpty || value.length < 4) {
                           return 'Wypełnij pole';
                         }
                         return null;
@@ -96,11 +108,7 @@ class AddWorkoutBody extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  print(myDropdownWidget.selectedDay);
-                  print(exercisesCards.exerciseList.length);
-                  print(trainingNameController.text);
-                }
+                _saveTraining(_formKey);
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).primaryColor),
@@ -114,6 +122,97 @@ class AddWorkoutBody extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _saveTraining(GlobalKey<FormState> formKey){
+    if(formKey.currentState!.validate()) {
+      showDialog(
+        barrierDismissible: false,
+        builder: (ctx) {
+          return LoadingSpinnerDialog();
+        },
+        context: context,
+      );
+
+      Workout workout =
+      new Workout(
+          dayOfWeek: CalendarWeek.dayOfWeekFromString(myDropdownWidget.selectedDay),
+          name: trainingNameController.text,
+          exercises: exercisesCards.exerciseList);
+
+
+      final Future<String> saveTrainingStatus = new TrainingAPI().addTrainingDay(workout);
+
+      saveTrainingStatus.then((result){
+
+        Navigator.of(context).pop();
+        print(result);
+        print("TESTT");
+        if(result == "Success"){
+          _showSuccessDialog(context);
+        } else{
+          _showFailedDialog(context);
+        }
+      }).catchError((error) {
+        print("TESTT");
+        print(error.toString());
+        Navigator.of(context).pop();
+        _showFailedDialog(context);
+      });
+    }
+  }
+
+  void _showSuccessDialog(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(localization.dialogTitleSuccessRegistration),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text("Zapis treningu zakończony pomyślnie"),
+                Text("Kliknij ok aby wrócić do ekranu z treningami"),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context, "Success");
+
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showFailedDialog(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Ups, coś poszło nie tak"),
+          content: Text("Spróbuj ponownie"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(localization.dialogRetryFailRegistration),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -34,6 +34,19 @@ class CalendarWeek extends StatelessWidget {
     DateTime date = DateTime.now().subtract(Duration(days: DateTime.now().weekday - dayIndex));
     return DateFormat('EEEE', 'pl').format(date);
   }
+
+  static int dayOfWeekFromString(String day) {
+    Map<String, int> days = {
+      'Poniedziałek': 1,
+      'Wtorek': 2,
+      'Środa': 3,
+      'Czwartek': 4,
+      'Piątek': 5,
+      'Sobota': 6,
+      'Niedziela': 7,
+    };
+    return days[day.toLowerCase()] ?? 0;
+  }
 }
 
 class MyDropdownWidget extends StatefulWidget {
