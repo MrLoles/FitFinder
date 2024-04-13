@@ -1,4 +1,4 @@
-import 'package:fitfinder/API/Auth.dart';
+import 'package:fitfinder/API/auth/Auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../general/LoadingSpinner.dart';

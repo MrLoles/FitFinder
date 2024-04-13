@@ -1,26 +1,34 @@
 import 'dart:convert';
 
+import 'package:fitfinder/API/training/TrainingAPI.dart';
 import 'package:fitfinder/main_page/additional_pages/AddWorkout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../API/model/workout/Workout.dart';
+import '../../API/training/model/Workout.dart';
 import '../../general/Calendar.dart';
 import '../../general/NavigationAnimation.dart';
 
-class MyWorkout extends StatelessWidget {
-  String jsonStr =
-      '[{"dayOfWeek":1,"name":"Klatka i biceps","exercises":[{"name":"wyciskanie na ławce poziomej","sets":"5","reps":"10,8,6,4,4","weights":"60kg,80kg,100kg,120kg,120kg","rest":"60sec, 60sec,120sec,120sec,120sec"},{"name":"wyciskanie hantli na ławce ukośnej","sets":"3","reps":"10,10,10","weights":"20kg,20kg,20kg","rest":"60sec,60sec,60sec"}]},{"dayOfWeek":2,"name":"Nogi i brzuch","exercises":[{"name":"przysiady","sets":"3","reps":"10,10,10","weights":"20kg,20kg,20kg","rest":"60sec,60sec,60sec"},{"name":"wyciskanie nogami","sets":"3","reps":"10,10,10","weights":"40kg,40kg,40kg","rest":"60sec,60sec,60sec"}]},{"dayOfWeek":3,"name":"Plecy","exercises":[{"name":"Podciąganie na drązku","sets":"3","reps":"10,10,10","weights":"0kg","rest":"120sec,120sec,120sec"},{"name":"Wyciąg górny drążek wąski","sets":"3","reps":"10,10,10","weights":"50kg,50kg,50kg","rest":"60sec,60sec,60sec"}]}]';
+class MyWorkout extends StatefulWidget {
+  @override
+  State<MyWorkout> createState() => _MyWorkoutState();
+
+  static _MyWorkoutState of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyWorkoutState>()!;
+}
+
+class _MyWorkoutState extends State<MyWorkout> {
+  void loadWorkouts() async {
+    new TrainingAPI().getAllTrainingDays();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> jsonList = jsonDecode(jsonStr);
-    List<Workout> workouts =
-        jsonList.map((workoutJson) => Workout.fromJson(workoutJson)).toList();
-
     Color primary = Theme.of(context).primaryColor;
 
     return Scaffold(
+      key: ValueKey(DateTime.now()),
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
@@ -31,7 +39,15 @@ class MyWorkout extends StatelessWidget {
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(context, NavigationAnimation.changeScreenWithAnimationRTL(AddWorkout())),
+        onPressed: () async {
+          final result = await Navigator.push(context,
+              NavigationAnimation.changeScreenWithAnimationRTL(AddWorkout()));
+          if (result != null) {
+            setState(() {
+
+            });;
+          }
+        },
         shape: CircleBorder(),
         child: Icon(
           Icons.add,
@@ -39,27 +55,59 @@ class MyWorkout extends StatelessWidget {
         ),
         backgroundColor: primary,
       ),
-      body: Container(
-          padding: EdgeInsets.only(left: 20, right: 20),
-          child: ListView(
-            children: [
-              Container(
-                  margin: EdgeInsets.only(top: 20),
-                  child: Text("Twój plan treningowy:",
-                      style: Theme.of(context).textTheme.headlineSmall)),
-              for (Workout workout in workouts)
-                _WorkoutRoutineCard(workout: workout),
-              SizedBox(
-                height: 20,
-              ),
-            ],
-          )),
+      body: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 20),
+            child: Text("Twój plan treningowy:",
+                style: Theme.of(context).textTheme.headlineSmall),
+          ),
+          SizedBox(height: 5,),
+          Expanded(
+            child: FutureBuilder<List<dynamic>>(
+              future: new TrainingAPI().getAllTrainingDays(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<dynamic>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                        "Wystąpił błąd z połączceniem sieciowym ${snapshot.error}"),
+                  );
+                } else {
+                  if (snapshot.data!.isEmpty) {
+                    return NoWorkoutsCard();
+                  } else {
+                    List<dynamic> jsonList = snapshot.data!;
+                    List<Workout> workouts = jsonList
+                        .map((workoutJson) => Workout.fromJson(workoutJson))
+                        .toList();
+                    return Container(
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      child: ListView(
+                        children: [
+                          for (Workout workout in workouts)
+                            _WorkoutRoutineCard(workout: workout),
+                          SizedBox(
+                            height: 20,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  void addTraining(){
-
-  }
+  void addTraining() {}
 }
 
 class _WorkoutRoutineCard extends StatefulWidget {
@@ -144,8 +192,37 @@ class _WorkoutRoutineCardState extends State<_WorkoutRoutineCard> {
               alignment: Alignment.center,
               icon: Icon(Icons.remove_circle_outlined, color: Colors.red),
               onPressed: () {
-                // Obsługa zdarzenia zamknięcia karty
+                MyWorkout.of(context).loadWorkouts();
               },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NoWorkoutsCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Niestety nie posiadasz jeszcze treningów :(",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            "Spróbuj je dodać guzikiem poniżej",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16,
             ),
           ),
         ],
