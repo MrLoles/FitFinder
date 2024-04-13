@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:fitfinder/API/training/TrainingAPI.dart';
-import 'package:fitfinder/main_page/additional_pages/AddWorkout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../API/training/model/Workout.dart';
-import '../../general/Calendar.dart';
-import '../../general/NavigationAnimation.dart';
+import '../../../API/training/model/Workout.dart';
+import '../../../general/Calendar.dart';
+import '../../../general/NavigationAnimation.dart';
+import 'AddWorkout.dart';
 
 class MyWorkout extends StatefulWidget {
   @override

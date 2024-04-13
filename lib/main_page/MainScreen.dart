@@ -1,4 +1,5 @@
-import 'package:fitfinder/main_page/additional_pages/MyWorkout.dart';
+import 'package:fitfinder/main_page/additional_pages/contact/ContactScreen.dart';
+import 'package:fitfinder/main_page/additional_pages/myWorkout/MyWorkout.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -362,6 +363,8 @@ class MenuItems extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.message),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ContactScreen())),
           title: const Text("Kontakt"),
         ),
         GestureDetector(
