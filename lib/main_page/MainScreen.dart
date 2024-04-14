@@ -1,4 +1,4 @@
-import 'package:fitfinder/API/gym/Gym.dart';
+import 'package:fitfinder/API/gym/model/Gym.dart';
 import 'package:fitfinder/main_page/additional_pages/contact/ContactScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myGyms/MyGymsScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myWorkout/MyWorkout.dart';
@@ -88,18 +88,13 @@ class MainScreen extends StatelessWidget {
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.grey[200],
-                                // Kolor tła kontenera
                                 borderRadius: BorderRadius.circular(10),
-                                // Zaokrąglenie rogów kontenera
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.grey.withOpacity(0.1),
-                                    // Kolor cienia
                                     spreadRadius: 3,
-                                    // Rozprzestrzenienie cienia
                                     blurRadius: 7,
-                                    // Rozmycie cienia
-                                    offset: Offset(0, 3), // Offset cienia
+                                    offset: Offset(0, 3),
                                   ),
                                 ],
                               ),
@@ -132,7 +127,7 @@ class PageViewBox extends StatelessWidget {
   final List<Map<String, String>> _dataList;
   final PageController _pageController = PageController(
     viewportFraction:
-    0.90, // Ustawienie viewportFraction na 0.8 (czyli 80% szerokości ekranu)
+    0.90,
   );
 
   @override
@@ -160,7 +155,7 @@ class CardTraining extends StatefulWidget {
 }
 
 class _CardTrainingState extends State<CardTraining> {
-  bool isTrainingCompleted = false; // Początkowa wartość Checkboxa
+  bool isTrainingCompleted = false;
   String trainingTime = "2:00h";
 
   @override
@@ -171,15 +166,13 @@ class _CardTrainingState extends State<CardTraining> {
           Container(
               decoration: BoxDecoration(
                 color: Colors.grey[200],
-                // Kolor tła kontenera
                 borderRadius: BorderRadius.circular(10),
-                // Zaokrąglenie rogów kontenera
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withOpacity(0.1), // Kolor cienia
-                    spreadRadius: 3, // Rozprzestrzenienie cienia
-                    blurRadius: 7, // Rozmycie cienia
-                    offset: Offset(0, 3), // Offset cienia
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 3,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
                   ),
                 ],
               ),

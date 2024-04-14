@@ -1,6 +1,8 @@
+import 'package:fitfinder/API/gym/GymAPI.dart';
 import 'package:flutter/material.dart';
 
-import '../../../API/gym/Gym.dart';
+import '../../../API/gym/model/Gym.dart';
+import '../../../general/LoadingSpinner.dart';
 import '../common/AdditionalScreenScaffold.dart';
 
 class GymScreen extends StatefulWidget {
@@ -48,7 +50,7 @@ class _GymScreenState extends State<GymScreen>
               color: isLiked ? Colors.red : null,
             ),
             onPressed: () {
-              // Dodaj kod obsługujący kliknięcie na serduszko
+              // Serduszko obłsuga!
             },
           ),
         ],
@@ -57,7 +59,7 @@ class _GymScreenState extends State<GymScreen>
         controller: _tabController,
         children: [
           _GeneralInfoTab(),
-          _GymEquipmentTab(),
+          _GymEquipmentTab(gym: widget.gym),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -82,86 +84,42 @@ class _GymScreenState extends State<GymScreen>
   }
 }
 
-class _GymEquipmentTab extends StatelessWidget {
-  final List<GymGear> gymCardioList = [];
-  final List<GymGear> gymFreeWeightsList = [];
-  final List<GymGear> gymFMachinesList = [];
+class _GymEquipmentTab extends StatefulWidget {
+  Gym gym;
 
   _GymEquipmentTab({
-    super.key,
+    super.key, required this.gym
   });
 
-  void initializelists() {
-    gymCardioList.add(new GymGear(
-        name: "Bieżnia",
-        category: "CARDIO",
-        description: "description",
-        quantity: 5,
-        imgUrl:
-            "https://www.urbogym.pl/wp-content/uploads/2021/09/urbogym1455-1.jpg"));
-    gymCardioList.add(new GymGear(
-        name: "Rowerek",
-        category: "CARDIO",
-        description: "description",
-        quantity: 3,
-        imgUrl:
-            "https://a.allegroimg.com/s512/11ecad/cf57b49a42f9a1d87453d9d15228/ROWEREK-STACJONARNY-ROWER-TRENINGOWY-BOOST-ZIPRO"));
-    gymCardioList.add(new GymGear(
-        name: "Wioślarz",
-        category: "CARDIO",
-        description: "description",
-        quantity: 3,
-        imgUrl:
-            "https://cdn.sport-shop.pl/p/v1/big/d159073338b34d1eb38a391bb5bddcf9.jpg"));
+  @override
+  State<_GymEquipmentTab> createState() => _GymEquipmentTabState();
+}
 
-    gymFreeWeightsList.add(new GymGear(
-        name: "Ławka płaska",
-        category: "Wolne ciężary",
-        description: "description",
-        quantity: 4,
-        imgUrl:
-            "https://trainingshowroom.com/12027-thickbox_default/lawka-plaska-olimpijska-proud-champion.jpg"));
-    gymFreeWeightsList.add(new GymGear(
-        name: "Skos ujemny",
-        category: "Wolne ciężary",
-        description: "description",
-        quantity: 1,
-        imgUrl:
-            "https://www.marbo-sport.pl/pol_pl_Lawka-skos-ujemny-ze-stojakami-MF-L008-Marbo-Sport-26513_3.png"));
-    gymFreeWeightsList.add(new GymGear(
-        name: "Skos dodatni",
-        category: "Wolne ciężary",
-        description: "description",
-        quantity: 2,
-        imgUrl:
-            "https://www.marbo-sport.pl/data/gfx/pictures/large/8/5/28958_1.jpg"));
+class _GymEquipmentTabState extends State<_GymEquipmentTab> {
+  final List<GymEquipment> gymCardioList = [];
 
-    gymFMachinesList.add(new GymGear(
-        name: "Butterfly",
-        category: "Maszyny",
-        description: "description",
-        quantity: 4,
-        imgUrl:
-            "https://cdn.globalso.com/dhzfitness/Butterfly-Machine-U2004C-1.jpg"));
-    gymFMachinesList.add(new GymGear(
-        name: "Maszyna smitha",
-        category: "Maszyny",
-        description: "description",
-        quantity: 1,
-        imgUrl:
-            "https://commercial.fitnessexperience.ca/cdn/shop/products/MX21_MAGNUMMG-PL62-03smithmachine_MatteBlk_hero_2048x.jpg?v=1620421828"));
-    gymFMachinesList.add(new GymGear(
-        name: "Atlas",
-        category: "Maszyny",
-        description: "description",
-        quantity: 2,
-        imgUrl:
-            "https://ss24.pl/images/ss24/888000-889000/ATLAS-TT4-BLACK-G159B-BH-FITNESS_%5B888280%5D_480.jpg"));
+  final List<GymEquipment> gymFreeWeightsList = [];
+
+  final List<GymEquipment> gymMachinesList = [];
+
+  final List<GymEquipment> gymAccessoriesList = [];
+
+  Future<void> initializelists() async{
+    gymCardioList.clear();
+    gymFreeWeightsList.clear();
+    gymMachinesList.clear();
+    gymAccessoriesList.clear();
+    List<GymEquipment> gymEquipmentList = await new GymAPI().findEquipmentOfGym(widget.gym.id.toString());
+      gymEquipmentList.forEach((equipment) {
+        if(equipment.category == "Cardio") gymCardioList.add(equipment);
+        else if(equipment.category == "Wolne ciężary") gymFreeWeightsList.add(equipment);
+        else if(equipment.category == "Maszyny") gymMachinesList.add(equipment);
+        else if(equipment.category == "Akcesoria") gymAccessoriesList.add(equipment);
+      });
   }
 
   @override
   Widget build(BuildContext context) {
-    initializelists();
 
     return SingleChildScrollView(
         child: Container(
@@ -175,12 +133,30 @@ class _GymEquipmentTab extends StatelessWidget {
                 .headlineSmall!
                 .copyWith(fontWeight: FontWeight.bold),
           ),
-          _Category(category: "CARDIO", gymGearList: gymCardioList),
-          _Category(category: "Wolne ciężary", gymGearList: gymFreeWeightsList),
-          _Category(category: "Maszyny", gymGearList: gymFMachinesList),
+          FutureBuilder(
+              future: initializelists(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return LoadingSpinnerPage();
+                }
+                else{
+                  return Column(
+                    children: [
+                      _Category(category: "CARDIO", gymGearList: gymCardioList),
+                      _Category(category: "Wolne ciężary", gymGearList: gymFreeWeightsList),
+                      _Category(category: "Maszyny", gymGearList: gymMachinesList),
+                      _Category(category: "Akcesoria", gymGearList: gymAccessoriesList),
+                    ],
+                  );
+                }
+              }),
         ],
       ),
     ));
+  }
+
+  Future<void> test() async {
+    return null;
   }
 }
 
@@ -346,7 +322,7 @@ class _Contact extends StatelessWidget {
 }
 
 class _TileEquipment extends StatelessWidget {
-  GymGear gymGear;
+  GymEquipment gymGear;
 
   _TileEquipment({required this.gymGear});
 
@@ -385,8 +361,12 @@ class _TileEquipment extends StatelessWidget {
             Container(
                 padding: EdgeInsets.all(25),
                 child: GestureDetector(
-                    onTap: () => showInfoDialog(context, gymGear.name,
-                        gymGear.description, gymGear.quantity, gymGear.imgUrl),
+                    onTap: () => showInfoDialog(
+                        context,
+                        gymGear.name,
+                        gymGear.description,
+                        gymGear.quantity,
+                        gymGear.imgUrl ?? "https://via.placeholder.com/100"),
                     child: Icon(
                       Icons.info_rounded,
                       color: theme.primaryColor,
@@ -435,7 +415,7 @@ class _TileEquipment extends StatelessWidget {
 }
 
 class _Category extends StatelessWidget {
-  final List<GymGear> gymGearList;
+  final List<GymEquipment> gymGearList;
   final String category;
 
   const _Category(

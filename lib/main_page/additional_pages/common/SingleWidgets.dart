@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../API/gym/Gym.dart';
+import '../../../API/gym/model/Gym.dart';
 
 class GymCard extends StatelessWidget{
   String imageLink;

@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../API/gym/Gym.dart';
+import '../../../API/gym/model/Gym.dart';
 import '../common/AdditionalScreenScaffold.dart';
 
 class MyGymsScreen extends StatelessWidget {
