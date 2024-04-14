@@ -1,3 +1,4 @@
+import 'package:fitfinder/API/gym/Gym.dart';
 import 'package:fitfinder/main_page/additional_pages/contact/ContactScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myGyms/MyGymsScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myWorkout/MyWorkout.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../general/Calendar.dart';
 import '../introduction/StartPage.dart';
+import 'additional_pages/common/SingleWidgets.dart';
 
 class MainScreen extends StatelessWidget {
   final List<Map<String, String>> _dataList = [
@@ -141,54 +143,7 @@ class PageViewBox extends StatelessWidget {
         controller: _pageController,
         itemCount: _dataList.length,
         itemBuilder: (BuildContext context, int index) {
-          return Card(
-            margin: EdgeInsets.symmetric(horizontal: 6.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 150,
-                  width: double.infinity,
-                  child: Image.network(
-                    _dataList[index]['image']!,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                ListTile(
-                  title: Text(
-                    _dataList[index]['nazwa']!,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Miasto: ${_dataList[index]['miasto']}'),
-                      Text('Ulica: ${_dataList[index]['ulica']}'),
-                      RichText(
-                        text: TextSpan(children: [
-                          TextSpan(
-                              text: "Otwarte dziś: ",
-                              style: TextStyle(
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .titleSmall!
-                                      .color)),
-                          TextSpan(
-                              text: _dataList[index]['hours'],
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context)
-                                      .textTheme
-                                      .titleSmall!
-                                      .color))
-                        ]),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
+          return GymCard(imageLink: _dataList[index]['image']!, gymName: _dataList[index]['nazwa']!, address: new Address(country: "PL", city: _dataList[index]['ulica']!, street: _dataList[index]['miasto']!), openingHours: _dataList[index]['hours'],);
         },
       ),
     );

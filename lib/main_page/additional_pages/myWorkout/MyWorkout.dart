@@ -26,7 +26,7 @@ class _MyWorkoutState extends State<MyWorkout> {
 
   @override
   Widget build(BuildContext context) {
-    return AdditionalScreenScaffold(
+    return AdditionalScreenScaffoldWithFloatingButton(
       titleOfPage: "Mój plan",
       floatingButtonAction: () async {
         final result = await Navigator.push(context,
