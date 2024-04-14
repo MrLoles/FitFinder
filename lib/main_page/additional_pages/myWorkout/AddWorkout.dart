@@ -7,9 +7,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
-import '../../API/training/model/Workout.dart';
-import '../../general/Calendar.dart';
-import '../../general/LoadingSpinner.dart';
+import '../../../API/training/model/Workout.dart';
+import '../../../general/Calendar.dart';
+import '../../../general/LoadingSpinner.dart';
 
 class AddWorkout extends StatelessWidget {
   @override
