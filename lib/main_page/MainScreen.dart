@@ -1,4 +1,5 @@
 import 'package:fitfinder/main_page/additional_pages/contact/ContactScreen.dart';
+import 'package:fitfinder/main_page/additional_pages/myGyms/MyGymsScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myWorkout/MyWorkout.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -356,6 +357,8 @@ class MenuItems extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.fitness_center),
           title: const Text("Moje siłownie"),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => MyGymsScreen())),
         ),
         ListTile(
           leading: const Icon(Icons.settings),
