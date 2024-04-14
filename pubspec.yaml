@@ -46,7 +46,7 @@ dependencies:
   animated_widgets: ^1.1.0
   dio: ^5.4.1
   email_validator: ^2.1.17
-  url_launcher: 6.0.9
+  url_launcher: ^6.2.6
 
 dev_dependencies:
   flutter_test:

@@ -36,6 +36,7 @@ class ContactScreen extends StatelessWidget {
                             .of(context)
                             .textTheme
                             .headlineSmall),
+                    Divider(),
                     _ListElementPoint(
                         text: "Masz problem z działaniem aplikacji"),
                     _ListElementPoint(
@@ -51,12 +52,14 @@ class ContactScreen extends StatelessWidget {
                   flex: 2,
                   child: Column(
                     children: [
-                      Text("Skontaktuj się z nami:", style: Theme
-                          .of(context)
-                          .textTheme
-                          .headlineSmall),
-                      Container(margin: EdgeInsets.only(top: 5, bottom: 10),
-                          child: Divider()),
+                      Divider(),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 20, top: 10),
+                        child: Text("Skontaktuj się z nami:", style: Theme
+                            .of(context)
+                            .textTheme
+                            .headlineSmall),
+                      ),
                       ElevatedButton(
                         onPressed: () => _sendEmail('fit.finder2024@gmail.com'),
                         style: ElevatedButton.styleFrom(
@@ -97,7 +100,6 @@ class ContactScreen extends StatelessWidget {
     final Uri _emailLaunchUri = Uri(
       scheme: 'mailto',
       path: email,
-      query: 'subject=App Feedback&body=App Version 3.23'
     );
 
     var url = _emailLaunchUri.toString();
