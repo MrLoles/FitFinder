@@ -56,6 +56,28 @@ class TrainingAPI{
     }
   }
 
+  Future<String> getSpecificTraining(int dayOfWeekNumber) async {
+    final _dio = Dio();
+
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token')!;
+
+    Options options = Options(headers: {"token":token});
+
+    try {
+      Response response = await _dio.get(_baseUrl + "/get/$dayOfWeekNumber", options: options).timeout(Duration(seconds: timeout));
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception('Request failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to fetch training days: $e');
+    }
+  }
+
   Future<String> addTrainingDay(Workout workout) async {
     final _dio = Dio();
 

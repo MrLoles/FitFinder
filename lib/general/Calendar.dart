@@ -37,13 +37,13 @@ class CalendarWeek extends StatelessWidget {
 
   static int dayOfWeekFromString(String day) {
     Map<String, int> days = {
-      'Poniedziałek': 1,
-      'Wtorek': 2,
-      'Środa': 3,
-      'Czwartek': 4,
-      'Piątek': 5,
-      'Sobota': 6,
-      'Niedziela': 7,
+      'poniedziałek': 1,
+      'wtorek': 2,
+      'środa': 3,
+      'czwartek': 4,
+      'piątek': 5,
+      'sobota': 6,
+      'niedziela': 7,
     };
     return days[day.toLowerCase()] ?? 0;
   }

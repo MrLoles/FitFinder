@@ -175,13 +175,18 @@ class _WorkoutRoutineCardState extends State<_WorkoutRoutineCard> {
               alignment: Alignment.center,
               icon: Icon(Icons.remove_circle_outlined, color: Colors.red),
               onPressed: () {
-                MyWorkout.of(context).loadWorkouts();
+                deleteTraining(widget.workout.dayOfWeek);
               },
             ),
           ),
         ],
       ),
     );
+  }
+
+  void deleteTraining(int dayOfWeek) async {
+    await new TrainingAPI().deleteTrainingDay(dayOfWeek);
+    MyWorkout.of(context).loadWorkouts();
   }
 }
 
