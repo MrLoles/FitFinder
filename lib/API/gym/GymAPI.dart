@@ -6,7 +6,7 @@ import 'package:fitfinder/API/gym/model/Gym.dart';
 class GymAPI{
   late final Dio _dio;
 
-  static const String _baseUrl = "http://10.0.2.2:8081/gym";
+  static const String _baseUrl = "http://173.212.201.249:8081/gym";
   final timeout = 8;
 
   GymAPI(){

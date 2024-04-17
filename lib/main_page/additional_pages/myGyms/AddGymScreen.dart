@@ -19,17 +19,24 @@ class _AddGymState extends State<AddGym> {
   List<Gym> foundedGyms = [];
   bool _isLoading = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool failedRequest = false;
 
   void search() async {
     if(_formKey.currentState!.validate()) {
+      failedRequest = false;
       foundedGyms.clear();
       setState(() {
         _isLoading = true;
       });
+      try{
         foundedGyms = await new GymAPI().findGyms(cityController.text, nameController.text);
-      setState(() {
-        _isLoading = false;
-      });
+      } catch (e){
+        failedRequest = true;
+      }finally{
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -97,7 +104,8 @@ class _AddGymState extends State<AddGym> {
               Expanded(
                 child: _isLoading? LoadingSpinnerPage() : ListView(
                   children: [
-                    for (final gym in foundedGyms)
+                    if(failedRequest) Text("Wystąpił problem z połączeniem internetowym")
+                    else for (final gym in foundedGyms)
                       Container(
                           margin: EdgeInsets.symmetric(vertical: 10),
                           child: GestureDetector(
@@ -109,7 +117,7 @@ class _AddGymState extends State<AddGym> {
                                                 GymScreen(gym)))
                                   },
                               child: GymCard(
-                                imageLink: gym.imgUrl ?? "https://img.freepik.com/premium-photo/contemporary-spotless-fitness-gym-center-interiorgenerative-ai_391052-10889.jpg",
+                                imageLink: gym.imgUrl!,
                                 address: gym.address,
                                 gymName: gym.gymName,
                               ))),

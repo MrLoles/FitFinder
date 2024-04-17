@@ -1,4 +1,5 @@
 import 'package:fitfinder/API/gym/GymAPI.dart';
+import 'package:fitfinder/API/user/UserAPI.dart';
 import 'package:flutter/material.dart';
 
 import '../../../API/gym/model/Gym.dart';
@@ -7,8 +8,11 @@ import '../common/AdditionalScreenScaffold.dart';
 
 class GymScreen extends StatefulWidget {
   Gym gym;
+  late UserAPI userAPI;
 
-  GymScreen(this.gym);
+  GymScreen(this.gym){
+   userAPI = new UserAPI();
+  }
 
   @override
   State<GymScreen> createState() => _GymScreenState();
@@ -21,6 +25,7 @@ class _GymScreenState extends State<GymScreen>
 
   @override
   void initState() {
+    fetchFavouriteStatus();
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabSelection);
@@ -49,9 +54,7 @@ class _GymScreenState extends State<GymScreen>
               isLiked ? Icons.favorite : Icons.favorite_border,
               color: isLiked ? Colors.red : null,
             ),
-            onPressed: () {
-              // Serduszko obłsuga!
-            },
+            onPressed: addToFavourites,
           ),
         ],
       ),
@@ -81,6 +84,39 @@ class _GymScreenState extends State<GymScreen>
         },
       ),
     );
+  }
+
+  addToFavourites() async{
+    showDialog(
+      barrierDismissible: false,
+      builder: (ctx) {
+        return LoadingSpinnerDialog();
+      },
+      context: context,
+    );
+    try{
+      await widget.userAPI.addGymToFavourites(widget.gym.id);
+      setState(() {
+        fetchFavouriteStatus();
+      });
+    }finally{
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> fetchFavouriteStatus() async {
+    try {
+      var response = await widget.userAPI.checkFavourites(widget.gym.id);
+      if (response.statusCode == 200) {
+        setState(() {
+          isLiked = response.data;
+        });
+      } else {
+        throw Exception('Failed to load favourite status');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }
 

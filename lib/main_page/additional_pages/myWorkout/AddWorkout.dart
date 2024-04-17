@@ -148,14 +148,12 @@ class _AddWorkoutBodyState extends State<AddWorkoutBody> {
 
         Navigator.of(context).pop();
         print(result);
-        print("TESTT");
         if(result == "Success"){
           _showSuccessDialog(context);
         } else{
           _showFailedDialog(context);
         }
       }).catchError((error) {
-        print("TESTT");
         print(error.toString());
         Navigator.of(context).pop();
         _showFailedDialog(context);

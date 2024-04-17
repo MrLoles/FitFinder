@@ -1,12 +1,21 @@
+import 'package:fitfinder/API/user/UserAPI.dart';
 import 'package:fitfinder/main_page/additional_pages/myGyms/AddGymScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../API/gym/model/Gym.dart';
+import '../../../general/LoadingSpinner.dart';
 import '../common/AdditionalScreenScaffold.dart';
 
-class MyGymsScreen extends StatelessWidget {
+class MyGymsScreen extends StatefulWidget {
+  @override
+  State<MyGymsScreen> createState() => _MyGymsScreenState();
+}
+
+class _MyGymsScreenState extends State<MyGymsScreen> {
+  List<Gym> foundedGyms = [];
+
   @override
   Widget build(BuildContext context) {
     return AdditionalScreenScaffoldWithFloatingButton(
@@ -33,13 +42,20 @@ class MyGymsScreen extends StatelessWidget {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  _CardGym(
-                    gymName: "Gorilla gym",
-                    gymAdress: new Address(
-                        country: "Polska",
-                        city: "Siedlce",
-                        street: "Partyzantów 14"),
-                  ),
+                  FutureBuilder(
+                      future: initializeMyGyms(),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        if (snapshot.connectionState != ConnectionState.done) {
+                          return LoadingSpinnerPage();
+                        }
+                        else{
+                          return Column(
+                            children: [
+                              for (final gym in foundedGyms) _CardGym(gym: gym)
+                            ],
+                          );
+                        }
+                      }),
                 ],
               ),
             )
@@ -48,13 +64,16 @@ class MyGymsScreen extends StatelessWidget {
       ),
     );
   }
+
+  initializeMyGyms() async {
+    foundedGyms = await new UserAPI().getFavouriteGyms();
+  }
 }
 
 class _CardGym extends StatelessWidget {
-  String gymName;
-  Address gymAdress;
+  Gym gym;
 
-  _CardGym({required this.gymName, required this.gymAdress});
+  _CardGym({required this.gym});
 
   @override
   Widget build(BuildContext context) {
@@ -65,27 +84,30 @@ class _CardGym extends StatelessWidget {
         //     return GymScreen(gym);
         //   }));
       },
-      child: Card(
-        margin: EdgeInsets.symmetric(horizontal: 6.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              height: 150,
-              width: double.infinity,
-              child: Image.network(
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzSOS8c7I9-rW1TjkNXXyc4virP40d2rsMLahbc98dqA&s",
-                fit: BoxFit.cover,
+      child: Container(
+        margin: EdgeInsets.only(bottom: 15),
+        child: Card(
+          margin: EdgeInsets.symmetric(horizontal: 6.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 150,
+                width: double.infinity,
+                child: Image.network(
+                  gym.imgUrl!,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            ListTile(
-              title: Text(
-                gymName,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Text("${gymAdress.city}, ul. ${gymAdress.street}"),
-            )
-          ],
+              ListTile(
+                title: Text(
+                  gym.gymName,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Text("${gym.address.city}, ul. ${gym.address.street}"),
+              )
+            ],
+          ),
         ),
       ),
     );
