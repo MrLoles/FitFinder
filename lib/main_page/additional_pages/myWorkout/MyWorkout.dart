@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:fitfinder/API/training/TrainingAPI.dart';
+import 'package:fitfinder/main_page/additional_pages/common/AdditionalScreenScaffold.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -25,36 +26,16 @@ class _MyWorkoutState extends State<MyWorkout> {
 
   @override
   Widget build(BuildContext context) {
-    Color primary = Theme.of(context).primaryColor;
-
-    return Scaffold(
-      key: ValueKey(DateTime.now()),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => {Navigator.pop(context)},
-        ),
-        title: Text("Mój plan"),
-        backgroundColor: primary,
-        centerTitle: true,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(context,
-              NavigationAnimation.changeScreenWithAnimationRTL(AddWorkout()));
-          if (result != null) {
-            setState(() {
-
-            });;
-          }
-        },
-        shape: CircleBorder(),
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
-        backgroundColor: primary,
-      ),
+    return AdditionalScreenScaffoldWithFloatingButton(
+      titleOfPage: "Mój plan",
+      floatingButtonAction: () async {
+        final result = await Navigator.push(context,
+            NavigationAnimation.changeScreenWithAnimationRTL(AddWorkout()));
+        if (result != null) {
+          setState(() {});
+          ;
+        }
+      },
       body: Column(
         children: [
           Container(
@@ -62,7 +43,9 @@ class _MyWorkoutState extends State<MyWorkout> {
             child: Text("Twój plan treningowy:",
                 style: Theme.of(context).textTheme.headlineSmall),
           ),
-          SizedBox(height: 5,),
+          SizedBox(
+            height: 5,
+          ),
           Expanded(
             child: FutureBuilder<List<dynamic>>(
               future: new TrainingAPI().getAllTrainingDays(),

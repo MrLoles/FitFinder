@@ -16,8 +16,6 @@ class TrainingAPI{
     WidgetsFlutterBinding.ensureInitialized();
     Future<SharedPreferences> futurePrefs = SharedPreferences.getInstance();
     SharedPreferences prefs = await futurePrefs;
-    print(":tset");
-    print(prefs.getString('token')!);
     String token = prefs.getString('token')!;
 
     Options options = Options(headers: {"token":token});
