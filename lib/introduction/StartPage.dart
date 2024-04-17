@@ -1,4 +1,4 @@
-import 'package:fitfinder/API/Auth.dart';
+import 'package:fitfinder/API/auth/Auth.dart';
 import 'package:fitfinder/introduction/ForgotPasswordPage.dart';
 import 'package:fitfinder/introduction/RegisterPage.dart';
 import 'package:fitfinder/main_page/MainScreen.dart';
@@ -59,7 +59,6 @@ class _StartPageState extends State<StartPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return StartPageScaffold(child: LoginRegisterForm());
   }
 }

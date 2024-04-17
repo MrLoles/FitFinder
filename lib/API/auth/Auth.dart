@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:fitfinder/API/model/Token.dart';
-import 'package:fitfinder/API/model/ValidateToken.dart';
+
+import 'model/Token.dart';
+import 'model/ValidateToken.dart';
 
 class AuthService {
   static const String _baseUrl = "http://173.212.201.249:8080/user";
-  final timeout = 5;
+  final timeout = 8;
 
   Future<String> login(String usernameOrEmail, String password) async {
     final _dio = Dio();

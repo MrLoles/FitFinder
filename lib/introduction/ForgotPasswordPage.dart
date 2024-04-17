@@ -2,7 +2,7 @@ import 'package:fitfinder/introduction/common/StartPageCommon.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-import '../API/Auth.dart';
+import '../API/auth/Auth.dart';
 import '../general/LoadingSpinner.dart';
 import 'StartPage.dart';
 
