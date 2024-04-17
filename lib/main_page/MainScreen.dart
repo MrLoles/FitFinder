@@ -252,14 +252,14 @@ class _CardTrainingState extends State<_CardTraining> {
                               ],
                             ),
                           ),
-                          trailing: Checkbox(
-                            value: isTrainingCompleted,
-                            onChanged: (newValue) {
-                              setState(() {
-                                isTrainingCompleted = newValue!;
-                              });
-                            },
-                          ),
+                          // trailing: Checkbox(
+                          //   value: isTrainingCompleted,
+                          //   onChanged: (newValue) {
+                          //     setState(() {
+                          //       isTrainingCompleted = newValue!;
+                          //     });
+                          //   },
+                          // ),
                         );
               }),
         ],

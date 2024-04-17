@@ -127,13 +127,13 @@ class _WorkoutRoutineCardState extends State<_WorkoutRoutineCard> {
                           fontSize:
                               Theme.of(context).textTheme.bodyLarge!.fontSize),
                     ),
-                    Checkbox(
-                        value: widget.isTrainingCompleted,
-                        onChanged: (value) => {
-                              setState(() {
-                                widget.isTrainingCompleted = value!;
-                              })
-                            })
+                    // Checkbox(
+                    //     value: widget.isTrainingCompleted,
+                    //     onChanged: (value) => {
+                    //           setState(() {
+                    //             widget.isTrainingCompleted = value!;
+                    //           })
+                    //         })
                   ],
                 ),
               ),
