@@ -1,12 +1,15 @@
 import 'package:fitfinder/API/gym/model/Gym.dart';
+import 'package:fitfinder/API/training/TrainingAPI.dart';
 import 'package:fitfinder/API/user/UserAPI.dart';
 import 'package:fitfinder/main_page/additional_pages/contact/ContactScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myGyms/GymScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myGyms/MyGymsScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myWorkout/MyWorkout.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../API/training/model/Workout.dart';
 import '../API/user/model/UserDetails.dart';
 import '../general/Calendar.dart';
 import '../general/LoadingSpinner.dart';
@@ -25,7 +28,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,34 +68,34 @@ class _MainScreenState extends State<MainScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      Text(
-                        "Placeholder",
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      Card(
-                        child: Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200],
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    spreadRadius: 3,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              // child: ListTile(
-                              //   title: Text("Tu coś będzie"),
-                              //   subtitle: Text("Może dostępni trenerzy"),
-                              // ),
-                            )
-                          ],
-                        ),
-                      )
+                      // Text(
+                      //   "Placeholder",
+                      //   style: Theme.of(context).textTheme.headlineSmall,
+                      // ),
+                      // Card(
+                      //   child: Column(
+                      //     children: [
+                      //       Container(
+                      //         decoration: BoxDecoration(
+                      //           color: Colors.grey[200],
+                      //           borderRadius: BorderRadius.circular(10),
+                      //           boxShadow: [
+                      //             BoxShadow(
+                      //               color: Colors.grey.withOpacity(0.1),
+                      //               spreadRadius: 3,
+                      //               blurRadius: 7,
+                      //               offset: Offset(0, 3),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //         child: ListTile(
+                      //           title: Text("Tu coś będzie"),
+                      //           subtitle: Text("Może dostępni trenerzy"),
+                      //         ),
+                      //       )
+                      //     ],
+                      //   ),
+                      // )
                     ],
                   ),
                 )
@@ -114,14 +116,18 @@ class PageViewBox extends StatelessWidget {
   });
 
   final PageController _pageController = PageController(
-    viewportFraction:
-    0.90,
+    viewportFraction: 0.90,
   );
 
-  initializeFavouriteGyms(BuildContext context) async{
+  initializeFavouriteGyms(BuildContext context) async {
     List<Gym> allFavouriteGyms = await new UserAPI().getFavouriteGyms();
     UserDetails userDetails = await new UserAPI().getUserDetails();
-    favouriteGyms = allFavouriteGyms.sublist(0, 3);
+    if (allFavouriteGyms.length == 0) {
+      favouriteGyms = [];
+    } else if (allFavouriteGyms.length <= 3) {
+      favouriteGyms = allFavouriteGyms;
+    } else
+      favouriteGyms = allFavouriteGyms.sublist(0, 3);
     MainScreen.of(context).widget.name = userDetails.username;
     MainScreen.of(context).widget.email = userDetails.email;
   }
@@ -129,44 +135,54 @@ class PageViewBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 250,
-      child:
-      FutureBuilder(
-          future: initializeFavouriteGyms(context),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return Center(child: LoadingSpinnerPage());
-            } else if (snapshot.hasError){
-              return Center(child: Text("Ups, coś poszło nie tak :("));
-            }
-            else{
-              return PageView.builder(
-                controller: _pageController,
-                itemCount: favouriteGyms.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () => {
-                      Navigator.push(context,
-                          new MaterialPageRoute(builder: (BuildContext context) {
-                            return GymScreen(favouriteGyms[index]);
-                          }))
-                    },
-                      child: GymCard(gym: favouriteGyms[index],
-                      ));
-                },
-              );
-            }
-          })
-    );
+        height: 250,
+        child: FutureBuilder(
+            future: initializeFavouriteGyms(context),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return Center(child: LoadingSpinnerPage());
+              } else if (snapshot.hasError) {
+                return Center(child: Text("Ups, coś poszło nie tak :("));
+              } else {
+                return favouriteGyms.length == 0
+                    ? Center(
+                        child: Align(
+                          child: Text(
+                            "Twoja lista ulubionych siłowni jest pusta!\n Dodaj je poprzez menu boczne!",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      )
+                    : PageView.builder(
+                        controller: _pageController,
+                        itemCount: favouriteGyms.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                              onTap: () => {
+                                    Navigator.push(context,
+                                        new MaterialPageRoute(
+                                            builder: (BuildContext context) {
+                                      return GymScreen(favouriteGyms[index]);
+                                    }))
+                                  },
+                              child: GymCard(
+                                gym: favouriteGyms[index],
+                              ));
+                        },
+                      );
+              }
+            }));
   }
-
-
 }
 
 class _CardTraining extends StatefulWidget {
-  _CardTraining({
-    super.key,
-  });
+  Workout? workout;
+
+  _CardTraining({super.key});
 
   @override
   State<_CardTraining> createState() => _CardTrainingState();
@@ -175,6 +191,7 @@ class _CardTraining extends StatefulWidget {
 class _CardTrainingState extends State<_CardTraining> {
   bool isTrainingCompleted = false;
   String trainingTime = "2:00h";
+  Workout? workout;
 
   @override
   Widget build(BuildContext context) {
@@ -195,30 +212,64 @@ class _CardTrainingState extends State<_CardTraining> {
                 ],
               ),
               child: CalendarWeek()),
-          ListTile(
-            title: Text(
-              "Trening nóg",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Szacowany czas treningu: " + trainingTime),
-                Text('Kliknij aby przejść do szczegółów'),
-              ],
-            ),
-            trailing: Checkbox(
-              value: isTrainingCompleted,
-              onChanged: (newValue) {
-                setState(() {
-                  isTrainingCompleted = newValue!;
-                });
-              },
-            ),
-          ),
+          FutureBuilder(
+              future: fetchTrainingData(context),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return Center(child: LoadingSpinnerDialog());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Ups, coś poszło nie tak :("));
+                } else
+                  return workout == null
+                      ? Container(
+                          margin: EdgeInsets.all(10),
+                          child: Text(
+                            "Na dziś nie masz zaplanowanego żadnego treningu",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ))
+                      : ListTile(
+                          title: Text(
+                            workout!.name,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: GestureDetector(
+                            onTap: () => {
+                              Navigator.push(context, new MaterialPageRoute(
+                                  builder: (BuildContext context) {
+                                return MyWorkout();
+                              }))
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    "Szacowany czas treningu: " + trainingTime),
+                                Text('Kliknij aby przejść do szczegółów'),
+                              ],
+                            ),
+                          ),
+                          trailing: Checkbox(
+                            value: isTrainingCompleted,
+                            onChanged: (newValue) {
+                              setState(() {
+                                isTrainingCompleted = newValue!;
+                              });
+                            },
+                          ),
+                        );
+              }),
         ],
       ),
     );
+  }
+
+  fetchTrainingData(BuildContext context) async {
+    workout =
+        await new TrainingAPI().getSpecificTraining(DateTime.now().weekday);
   }
 }
 
@@ -279,7 +330,6 @@ class _UserDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     TextTheme theme = Theme.of(context).primaryTextTheme;
 
-
     return Container(
       padding: EdgeInsets.only(top: 10),
       child: Column(
@@ -316,16 +366,16 @@ class MenuItems extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.calendar_month),
           onTap: () => {
-            Navigator.push(context,
-            MaterialPageRoute(builder: (context) => MyWorkout()))
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MyWorkout()))
           },
           title: const Text("Mój plan"),
         ),
         ListTile(
           leading: const Icon(Icons.fitness_center),
           title: const Text("Moje siłownie"),
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (context) => MyGymsScreen())),
+          onTap: () => Navigator.push(
+              context, MaterialPageRoute(builder: (context) => MyGymsScreen())),
         ),
         ListTile(
           leading: const Icon(Icons.settings),
@@ -341,9 +391,9 @@ class MenuItems extends StatelessWidget {
           onTap: () {
             Navigator.pushReplacement(context,
                 new MaterialPageRoute(builder: (BuildContext context) {
-                  _clearSharedPrefs();
-                  return StartPage();
-                }));
+              _clearSharedPrefs();
+              return StartPage();
+            }));
           },
           child: ListTile(
             leading: const Icon(Icons.logout),
@@ -354,8 +404,9 @@ class MenuItems extends StatelessWidget {
     );
   }
 
-  void _clearSharedPrefs() async{
-    final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  void _clearSharedPrefs() async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
     sharedPreferences.remove("token");
   }
 }

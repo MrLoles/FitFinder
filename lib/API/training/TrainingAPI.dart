@@ -56,7 +56,7 @@ class TrainingAPI{
     }
   }
 
-  Future<String> getSpecificTraining(int dayOfWeekNumber) async {
+  Future<Workout?> getSpecificTraining(int dayOfWeekNumber) async {
     final _dio = Dio();
 
     WidgetsFlutterBinding.ensureInitialized();
@@ -69,7 +69,10 @@ class TrainingAPI{
       Response response = await _dio.get(_baseUrl + "/get/$dayOfWeekNumber", options: options).timeout(Duration(seconds: timeout));
 
       if (response.statusCode == 200) {
-        return response.data;
+        if(response.data == ""){
+          return null;
+        }
+        return Workout.fromJson(response.data);
       } else {
         throw Exception('Request failed with status: ${response.statusCode}');
       }

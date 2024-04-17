@@ -33,7 +33,6 @@ class _MyWorkoutState extends State<MyWorkout> {
             NavigationAnimation.changeScreenWithAnimationRTL(AddWorkout()));
         if (result != null) {
           setState(() {});
-          ;
         }
       },
       body: Column(

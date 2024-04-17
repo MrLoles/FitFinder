@@ -77,6 +77,9 @@ class UserAPI {
 
     if (response.statusCode == 200) {
       List<dynamic> foundedGyms = response.data;
+      if(foundedGyms.isEmpty){
+        return [];
+      }
       return Gym.loadGyms(foundedGyms);
     } else {
       throw Exception('Request failed with status: ${response.statusCode}');
