@@ -117,9 +117,7 @@ class _AddGymState extends State<AddGym> {
                                                 GymScreen(gym)))
                                   },
                               child: GymCard(
-                                imageLink: gym.imgUrl!,
-                                address: gym.address,
-                                gymName: gym.gymName,
+                                gym: gym
                               ))),
                   ],
                 ),

@@ -1,41 +1,30 @@
 import 'package:fitfinder/API/gym/model/Gym.dart';
+import 'package:fitfinder/API/user/UserAPI.dart';
 import 'package:fitfinder/main_page/additional_pages/contact/ContactScreen.dart';
+import 'package:fitfinder/main_page/additional_pages/myGyms/GymScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myGyms/MyGymsScreen.dart';
 import 'package:fitfinder/main_page/additional_pages/myWorkout/MyWorkout.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../API/user/model/UserDetails.dart';
 import '../general/Calendar.dart';
+import '../general/LoadingSpinner.dart';
 import '../introduction/StartPage.dart';
 import 'additional_pages/common/SingleWidgets.dart';
 
-class MainScreen extends StatelessWidget {
-  final List<Map<String, String>> _dataList = [
-    {
-      'nazwa': 'Firma A',
-      'miasto': 'Kraków',
-      'ulica': 'ul. Kawiarniana 12',
-      'hours': '8:00-22:00',
-      'image':
-          'https://st2.depositphotos.com/1017228/7108/i/450/depositphotos_71080145-stock-photo-gym-interior-with-equipment.jpg'
-    },
-    {
-      'nazwa': 'Firma B',
-      'miasto': 'Warszawa',
-      'ulica': 'ul. Handlowa 5',
-      'hours': '8:00-24:00',
-      'image':
-          'https://static.vecteezy.com/system/resources/thumbnails/026/781/389/small/gym-interior-background-of-dumbbells-on-rack-in-fitness-and-workout-room-photo.jpg'
-    },
-    {
-      'nazwa': 'Firma C',
-      'miasto': 'Gdańsk',
-      'ulica': 'ul. Portowa 8',
-      'hours': '6:00-22:00',
-      'image':
-          'https://img.freepik.com/premium-photo/powerful-fitness-gym-background_849761-28993.jpg'
-    },
-  ];
+class MainScreen extends StatefulWidget {
+  String name = "user";
+  String email = "placeholder@email.com";
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+
+  static _MainScreenState of(BuildContext context) =>
+      context.findAncestorStateOfType<_MainScreenState>()!;
+}
+
+class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +49,7 @@ class MainScreen extends StatelessWidget {
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ),
-                PageViewBox(
-                    dataList: _dataList),
+                PageViewBox(),
                 Container(
                   margin: EdgeInsets.all(20),
                   child: Column(
@@ -74,7 +62,7 @@ class MainScreen extends StatelessWidget {
                       SizedBox(
                         height: 10,
                       ),
-                      CardTraining(),
+                      _CardTraining(),
                       SizedBox(
                         height: 10,
                       ),
@@ -98,10 +86,10 @@ class MainScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              child: ListTile(
-                                title: Text("Tu coś będzie"),
-                                subtitle: Text("Może dostępni trenerzy"),
-                              ),
+                              // child: ListTile(
+                              //   title: Text("Tu coś będzie"),
+                              //   subtitle: Text("Może dostępni trenerzy"),
+                              // ),
                             )
                           ],
                         ),
@@ -119,42 +107,72 @@ class MainScreen extends StatelessWidget {
 }
 
 class PageViewBox extends StatelessWidget {
+  List<Gym> favouriteGyms = [];
+
   PageViewBox({
     super.key,
-    required List<Map<String, String>> dataList,
-  })  : _dataList = dataList;
+  });
 
-  final List<Map<String, String>> _dataList;
   final PageController _pageController = PageController(
     viewportFraction:
     0.90,
   );
 
+  initializeFavouriteGyms(BuildContext context) async{
+    List<Gym> allFavouriteGyms = await new UserAPI().getFavouriteGyms();
+    UserDetails userDetails = await new UserAPI().getUserDetails();
+    favouriteGyms = allFavouriteGyms.sublist(0, 3);
+    MainScreen.of(context).widget.name = userDetails.username;
+    MainScreen.of(context).widget.email = userDetails.email;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 250,
-      child: PageView.builder(
-        controller: _pageController,
-        itemCount: _dataList.length,
-        itemBuilder: (BuildContext context, int index) {
-          return GymCard(imageLink: _dataList[index]['image']!, gymName: _dataList[index]['nazwa']!, address: new Address(country: "PL", city: _dataList[index]['ulica']!, street: _dataList[index]['miasto']!), openingHours: _dataList[index]['hours'],);
-        },
-      ),
+      child:
+      FutureBuilder(
+          future: initializeFavouriteGyms(context),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return Center(child: LoadingSpinnerPage());
+            } else if (snapshot.hasError){
+              return Center(child: Text("Ups, coś poszło nie tak :("));
+            }
+            else{
+              return PageView.builder(
+                controller: _pageController,
+                itemCount: favouriteGyms.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () => {
+                      Navigator.push(context,
+                          new MaterialPageRoute(builder: (BuildContext context) {
+                            return GymScreen(favouriteGyms[index]);
+                          }))
+                    },
+                      child: GymCard(gym: favouriteGyms[index],
+                      ));
+                },
+              );
+            }
+          })
     );
   }
+
+
 }
 
-class CardTraining extends StatefulWidget {
-  CardTraining({
+class _CardTraining extends StatefulWidget {
+  _CardTraining({
     super.key,
   });
 
   @override
-  State<CardTraining> createState() => _CardTrainingState();
+  State<_CardTraining> createState() => _CardTrainingState();
 }
 
-class _CardTrainingState extends State<CardTraining> {
+class _CardTrainingState extends State<_CardTraining> {
   bool isTrainingCompleted = false;
   String trainingTime = "2:00h";
 
@@ -179,7 +197,7 @@ class _CardTrainingState extends State<CardTraining> {
               child: CalendarWeek()),
           ListTile(
             title: Text(
-              "Trening klaty",
+              "Trening nóg",
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Column(
@@ -261,16 +279,17 @@ class _UserDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     TextTheme theme = Theme.of(context).primaryTextTheme;
 
+
     return Container(
       padding: EdgeInsets.only(top: 10),
       child: Column(
         children: [
           Text(
-            "John Doe",
+            MainScreen.of(context).widget.name,
             style: theme.bodyLarge,
           ),
           Text(
-            "JohnDoe@gmail.com",
+            MainScreen.of(context).widget.email,
             style: theme.bodyMedium,
           )
         ],

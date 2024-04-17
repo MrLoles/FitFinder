@@ -24,7 +24,7 @@ class Gym {
       address: Address.fromJson(json['address']),
       openingHours: json['openingHours'] != null
           ? List<String>.from(json['openingHours'])
-          : null,
+          : ["8:00-16:00", "8:00-16:00", "8:00-22:00", "8:00-20:00", "8:00-16:00", "8:00-20:00", "8:00-21:00"],
       imgUrl: json['imgUrl'] != null
       ? json['imgUrl'] : "https://img.freepik.com/premium-photo/contemporary-spotless-fitness-gym-center-interiorgenerative-ai_391052-10889.jpg",
     );
@@ -32,9 +32,7 @@ class Gym {
 
   static List<Gym> parseGyms(String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-    print("test");
     List<Gym> res = parsed.map<Gym>((json) => Gym.fromJson(json)).toList();
-    print(res[1].gymName);
     return parsed.map<Gym>((json) => Gym.fromJson(json)).toList();
   }
 

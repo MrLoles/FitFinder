@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import '../../../API/gym/model/Gym.dart';
 import '../../../general/LoadingSpinner.dart';
 import '../common/AdditionalScreenScaffold.dart';
+import 'GymScreen.dart';
 
 class MyGymsScreen extends StatefulWidget {
   @override
@@ -79,10 +80,10 @@ class _CardGym extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigator.push(context,
-        //   new MaterialPageRoute(builder: (BuildContext context) {
-        //     return GymScreen(gym);
-        //   }));
+        Navigator.push(context,
+          new MaterialPageRoute(builder: (BuildContext context) {
+            return GymScreen(gym);
+          }));
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 15),

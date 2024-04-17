@@ -4,15 +4,14 @@ import 'package:flutter/material.dart';
 import '../../../API/gym/model/Gym.dart';
 
 class GymCard extends StatelessWidget{
-  String imageLink;
-  String gymName;
-  Address address;
-  String? openingHours;
+  Gym gym;
 
-  GymCard({required this.imageLink, required this.gymName, required this.address, this.openingHours});
+  GymCard({required this.gym});
 
   @override
   Widget build(BuildContext context) {
+
+
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 6.0),
       child: Column(
@@ -22,21 +21,21 @@ class GymCard extends StatelessWidget{
             height: 150,
             width: double.infinity,
             child: Image.network(
-              imageLink,
+              gym.imgUrl!,
               fit: BoxFit.cover,
             ),
           ),
           ListTile(
             title: Text(
-              gymName,
+              gym.gymName,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Miasto: ${address.city}'),
-                Text('Ulica: ${address.street}'),
-                if(openingHours != null) RichText(
+                Text('Miasto: ${gym.address.city}'),
+                Text('Ulica: ${gym.address.street}'),
+                if(gym.openingHours != null) RichText(
                   text: TextSpan(children: [
                     TextSpan(
                         text: "Otwarte dziś: ",
@@ -46,7 +45,7 @@ class GymCard extends StatelessWidget{
                                 .titleSmall!
                                 .color)),
                     TextSpan(
-                        text: openingHours,
+                        text: gym.openingHours![DateTime.now().weekday],
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context)
@@ -62,5 +61,6 @@ class GymCard extends StatelessWidget{
       ),
     );
   }
+
 
 }
