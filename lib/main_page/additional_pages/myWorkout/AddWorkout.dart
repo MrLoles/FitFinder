@@ -1,11 +1,8 @@
 import 'dart:convert';
 
 import 'package:fitfinder/API/training/TrainingAPI.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 
 import '../../../API/training/model/Workout.dart';
 import '../../../general/Calendar.dart';
@@ -79,12 +76,17 @@ class _AddWorkoutBodyState extends State<AddWorkoutBody> {
                       style: fontStyle,
                       maxLength: 30,
                       decoration: InputDecoration(
-                        counterText: '', // Wyłącz domyślny licznik znaków
-                        suffix: Text('0/30'), // Ustaw niestandardowy licznik znaków
-                        suffixStyle: TextStyle(color: Colors.grey), // Styl dla licznika znaków
+                        counterText: '',
+                        // Wyłącz domyślny licznik znaków
+                        suffix: Text('0/30'),
+                        // Ustaw niestandardowy licznik znaków
+                        suffixStyle: TextStyle(
+                            color: Colors.grey), // Styl dla licznika znaków
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty || value.length < 4) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.length < 4) {
                           return 'Wypełnij pole';
                         }
                         return null;
@@ -92,7 +94,9 @@ class _AddWorkoutBodyState extends State<AddWorkoutBody> {
                       controller: trainingNameController,
                     ),
                   ),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Text("Ćwiczenia: ",
                       style: fontStyle.copyWith(fontWeight: FontWeight.bold)),
                   SizedBox(
@@ -125,8 +129,8 @@ class _AddWorkoutBodyState extends State<AddWorkoutBody> {
     );
   }
 
-  void _saveTraining(GlobalKey<FormState> formKey){
-    if(formKey.currentState!.validate()) {
+  void _saveTraining(GlobalKey<FormState> formKey) {
+    if (formKey.currentState!.validate()) {
       showDialog(
         barrierDismissible: false,
         builder: (ctx) {
@@ -135,26 +139,23 @@ class _AddWorkoutBodyState extends State<AddWorkoutBody> {
         context: context,
       );
 
-      Workout workout =
-      new Workout(
-          dayOfWeek: CalendarWeek.dayOfWeekFromString(myDropdownWidget.selectedDay),
+      Workout workout = new Workout(
+          dayOfWeek:
+              CalendarWeek.dayOfWeekFromString(myDropdownWidget.selectedDay),
           name: trainingNameController.text,
           exercises: exercisesCards.exerciseList);
 
+      final Future<String> saveTrainingStatus =
+          new TrainingAPI().addTrainingDay(workout);
 
-      final Future<String> saveTrainingStatus = new TrainingAPI().addTrainingDay(workout);
-
-      saveTrainingStatus.then((result){
-
+      saveTrainingStatus.then((result) {
         Navigator.of(context).pop();
-        print(result);
-        if(result == "Success"){
+        if (result == "Success") {
           _showSuccessDialog(context);
-        } else{
+        } else {
           _showFailedDialog(context);
         }
       }).catchError((error) {
-        print(error.toString());
         Navigator.of(context).pop();
         _showFailedDialog(context);
       });
@@ -182,7 +183,6 @@ class _AddWorkoutBodyState extends State<AddWorkoutBody> {
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(context, "Success");
-
               },
               child: Text('OK'),
             ),
