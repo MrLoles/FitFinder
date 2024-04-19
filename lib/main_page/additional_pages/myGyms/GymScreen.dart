@@ -10,8 +10,8 @@ class GymScreen extends StatefulWidget {
   Gym gym;
   late UserAPI userAPI;
 
-  GymScreen(this.gym){
-   userAPI = new UserAPI();
+  GymScreen(this.gym) {
+    userAPI = new UserAPI();
   }
 
   @override
@@ -86,7 +86,7 @@ class _GymScreenState extends State<GymScreen>
     );
   }
 
-  addToFavourites() async{
+  addToFavourites() async {
     showDialog(
       barrierDismissible: false,
       builder: (ctx) {
@@ -94,12 +94,12 @@ class _GymScreenState extends State<GymScreen>
       },
       context: context,
     );
-    try{
+    try {
       await widget.userAPI.addGymToFavourites(widget.gym.id);
       setState(() {
         fetchFavouriteStatus();
       });
-    }finally{
+    } finally {
       Navigator.of(context).pop();
     }
   }
@@ -114,18 +114,14 @@ class _GymScreenState extends State<GymScreen>
       } else {
         throw Exception('Failed to load favourite status');
       }
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 }
 
 class _GymEquipmentTab extends StatefulWidget {
   Gym gym;
 
-  _GymEquipmentTab({
-    super.key, required this.gym
-  });
+  _GymEquipmentTab({super.key, required this.gym});
 
   @override
   State<_GymEquipmentTab> createState() => _GymEquipmentTabState();
@@ -140,23 +136,27 @@ class _GymEquipmentTabState extends State<_GymEquipmentTab> {
 
   final List<GymEquipment> gymAccessoriesList = [];
 
-  Future<void> initializelists() async{
+  Future<void> initializelists() async {
     gymCardioList.clear();
     gymFreeWeightsList.clear();
     gymMachinesList.clear();
     gymAccessoriesList.clear();
-    List<GymEquipment> gymEquipmentList = await new GymAPI().findEquipmentOfGym(widget.gym.id.toString());
-      gymEquipmentList.forEach((equipment) {
-        if(equipment.category == "Cardio") gymCardioList.add(equipment);
-        else if(equipment.category == "Wolne ciężary") gymFreeWeightsList.add(equipment);
-        else if(equipment.category == "Maszyny") gymMachinesList.add(equipment);
-        else if(equipment.category == "Akcesoria") gymAccessoriesList.add(equipment);
-      });
+    List<GymEquipment> gymEquipmentList =
+        await new GymAPI().findEquipmentOfGym(widget.gym.id);
+    gymEquipmentList.forEach((equipment) {
+      if (equipment.category == "Cardio")
+        gymCardioList.add(equipment);
+      else if (equipment.category == "Wolne ciężary")
+        gymFreeWeightsList.add(equipment);
+      else if (equipment.category == "Maszyny")
+        gymMachinesList.add(equipment);
+      else if (equipment.category == "Akcesoria")
+        gymAccessoriesList.add(equipment);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return SingleChildScrollView(
         child: Container(
       margin: EdgeInsets.all(10),
@@ -174,14 +174,18 @@ class _GymEquipmentTabState extends State<_GymEquipmentTab> {
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) {
                   return LoadingSpinnerPage();
-                }
-                else{
+                } else {
                   return Column(
                     children: [
                       _Category(category: "CARDIO", gymGearList: gymCardioList),
-                      _Category(category: "Wolne ciężary", gymGearList: gymFreeWeightsList),
-                      _Category(category: "Maszyny", gymGearList: gymMachinesList),
-                      _Category(category: "Akcesoria", gymGearList: gymAccessoriesList),
+                      _Category(
+                          category: "Wolne ciężary",
+                          gymGearList: gymFreeWeightsList),
+                      _Category(
+                          category: "Maszyny", gymGearList: gymMachinesList),
+                      _Category(
+                          category: "Akcesoria",
+                          gymGearList: gymAccessoriesList),
                     ],
                   );
                 }
@@ -189,10 +193,6 @@ class _GymEquipmentTabState extends State<_GymEquipmentTab> {
         ],
       ),
     ));
-  }
-
-  Future<void> test() async {
-    return null;
   }
 }
 
@@ -357,6 +357,38 @@ class _Contact extends StatelessWidget {
   }
 }
 
+class _Category extends StatelessWidget {
+  final List<GymEquipment> gymGearList;
+  final String category;
+
+  const _Category(
+      {super.key, required this.gymGearList, required this.category});
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
+    return Column(
+      children: [
+        Divider(),
+        Text(
+          category,
+          style:
+              theme.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
+        ),
+        Column(
+          children: [
+            for (final gymGear in gymGearList)
+              _TileEquipment(
+                gymGear: gymGear,
+              )
+          ],
+        )
+      ],
+    );
+  }
+}
+
 class _TileEquipment extends StatelessWidget {
   GymEquipment gymGear;
 
@@ -446,38 +478,6 @@ class _TileEquipment extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-class _Category extends StatelessWidget {
-  final List<GymEquipment> gymGearList;
-  final String category;
-
-  const _Category(
-      {super.key, required this.gymGearList, required this.category});
-
-  @override
-  Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
-
-    return Column(
-      children: [
-        Divider(),
-        Text(
-          category,
-          style:
-              theme.textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold),
-        ),
-        Column(
-          children: [
-            for (final gymGear in gymGearList)
-              _TileEquipment(
-                gymGear: gymGear,
-              )
-          ],
-        )
-      ],
     );
   }
 }

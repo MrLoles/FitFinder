@@ -24,9 +24,18 @@ class Gym {
       address: Address.fromJson(json['address']),
       openingHours: json['openingHours'] != null
           ? List<String>.from(json['openingHours'])
-          : ["8:00-16:00", "8:00-16:00", "8:00-22:00", "8:00-20:00", "8:00-16:00", "8:00-20:00", "8:00-21:00"],
+          : [
+              "8:00-16:00",
+              "8:00-16:00",
+              "8:00-22:00",
+              "8:00-20:00",
+              "8:00-16:00",
+              "8:00-20:00",
+              "8:00-21:00"
+            ],
       imgUrl: json['imgUrl'] != null
-      ? json['imgUrl'] : "https://img.freepik.com/premium-photo/contemporary-spotless-fitness-gym-center-interiorgenerative-ai_391052-10889.jpg",
+          ? json['imgUrl']
+          : "https://img.freepik.com/premium-photo/contemporary-spotless-fitness-gym-center-interiorgenerative-ai_391052-10889.jpg",
     );
   }
 
@@ -37,8 +46,8 @@ class Gym {
   }
 
   static Future<List<Gym>> loadGyms(List<dynamic> jsonResponse) async {
-      String jsonString = json.encode(jsonResponse);
-      return parseGyms(jsonString);
+    String jsonString = json.encode(jsonResponse);
+    return parseGyms(jsonString);
   }
 }
 
@@ -59,6 +68,7 @@ class Address {
 }
 
 class GymEquipment {
+  final int id;
   final String name;
   final String category;
   final String description;
@@ -66,6 +76,7 @@ class GymEquipment {
   final int quantity;
 
   GymEquipment({
+    required this.id,
     required this.name,
     required this.category,
     required this.description,
@@ -75,6 +86,7 @@ class GymEquipment {
 
   factory GymEquipment.fromJson(Map<String, dynamic> json) {
     return GymEquipment(
+      id: json['id'] ?? 0,
       name: json['name'],
       category: json['category'],
       description: json['description'],
@@ -85,10 +97,13 @@ class GymEquipment {
 
   static List<GymEquipment> parseGymEquipmentList(String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-    return parsed.map<GymEquipment>((json) => GymEquipment.fromJson(json)).toList();
+    return parsed
+        .map<GymEquipment>((json) => GymEquipment.fromJson(json))
+        .toList();
   }
 
-  static Future<List<GymEquipment>> loadEquipment(List<dynamic> jsonResponse) async {
+  static Future<List<GymEquipment>> loadEquipment(
+      List<dynamic> jsonResponse) async {
     String jsonString = json.encode(jsonResponse);
     return parseGymEquipmentList(jsonString);
   }

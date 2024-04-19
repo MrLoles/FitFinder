@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../gym/model/Gym.dart';
+import 'model/AdministratedGyms.dart';
 import 'model/UserDetails.dart';
 
 class UserAPI {
@@ -97,8 +98,28 @@ class UserAPI {
 
 
     if (response.statusCode == 200) {
-      print(response.data);
       return UserDetails.fromJson(response.data);
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}');
+    }
+  }
+
+  Future<List<AdministratedGym>> getAdministatedGyms() async{
+    Future<SharedPreferences> futurePrefs = SharedPreferences.getInstance();
+    SharedPreferences prefs = await futurePrefs;
+    String token = prefs.getString('token')!;
+
+    Options options = Options(headers: {"token": token});
+
+    Response response = await _dio.get(_baseUrl + "/administratedGyms", options: options).timeout(Duration(seconds: timeout));
+
+
+    if (response.statusCode == 200) {
+      List<dynamic> foundedGyms = response.data;
+      if(foundedGyms.isEmpty){
+        return [];
+      }
+      return AdministratedGym.loadAdministratedGyms(foundedGyms);
     } else {
       throw Exception('Request failed with status: ${response.statusCode}');
     }
