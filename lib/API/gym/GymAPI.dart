@@ -47,7 +47,7 @@ class GymAPI {
   Future<GymInformationWithEquipment> getInformationWithEquipment(
       int gymId) async {
     Response response = await _dio
-        .get("http://10.0.2.2:8081/gym" + "/$gymId/getInformationWithEquipment")
+        .get(_baseUrl + "/$gymId/getInformationWithEquipment")
         .timeout(Duration(seconds: timeout));
 
     if (response.statusCode == 200) {
@@ -80,7 +80,7 @@ class GymAPI {
     };
 
     Response response = await _dio
-        .post("http://10.0.2.2:8081/gym" + "/$gymId/addEquipment", data: data)
+        .post(_baseUrl + "/$gymId/addEquipment", data: data)
         .timeout(Duration(seconds: timeout));
 
     if (response.statusCode == 200) {

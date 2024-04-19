@@ -222,5 +222,6 @@ class _TileEquipment extends StatelessWidget {
   deleteEquipment(BuildContext context, int gymId, int equipmentId) async {
     new GymAPI().deleteGymEquipment(gymId, equipmentId);
     _GymEquipment.of(context).setState(() {});
+    ;
   }
 }

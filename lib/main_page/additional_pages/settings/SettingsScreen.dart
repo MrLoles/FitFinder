@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import '../common/AdditionalScreenScaffold.dart';
 
 class SettingsScreen extends StatelessWidget{
-  bool value = true;
+  bool isAdmin;
+
+  SettingsScreen(this.isAdmin);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class SettingsScreen extends StatelessWidget{
               title: Text("Zmień nazwę użytkownika", style: textStyle),
             ),
             Divider(),
-            value ? Column(
+            isAdmin ? Column(
               children: [
                 ListTile(leading: Icon(Icons.fitness_center_sharp),
                 title: Text("Zarządzane siłownie", style: textStyle),
