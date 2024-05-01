@@ -25,12 +25,13 @@ class Gym {
       openingHours: json['openingHours'] != null
           ? List<String>.from(json['openingHours'])
           : [
-              "8:00-16:00",
+              "empty", //starts from 1
               "8:00-16:00",
               "8:00-22:00",
               "8:00-20:00",
               "8:00-16:00",
               "8:00-20:00",
+              "8:00-21:00",
               "8:00-21:00"
             ],
       imgUrl: json['imgUrl'] != null

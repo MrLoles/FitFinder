@@ -51,9 +51,12 @@ class _MainScreenState extends State<MainScreen> {
             future: fetchUserData(context),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
-                return Center(child: Column(
+                return Center(
+                    child: Column(
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.4,),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.4,
+                    ),
                     LoadingSpinnerPage(),
                   ],
                 ));
@@ -71,7 +74,9 @@ class _MainScreenState extends State<MainScreen> {
                           style: Theme.of(context).textTheme.headlineSmall,
                         ),
                       ),
-                      PageViewBox(favouriteGyms: favouriteGyms,),
+                      PageViewBox(
+                        favouriteGyms: favouriteGyms,
+                      ),
                       Container(
                         margin: EdgeInsets.all(20),
                         child: Column(
@@ -84,7 +89,9 @@ class _MainScreenState extends State<MainScreen> {
                             SizedBox(
                               height: 10,
                             ),
-                            _CardTraining(workout: workout,),
+                            _CardTraining(
+                              workout: workout,
+                            ),
                             SizedBox(
                               height: 10,
                             ),
@@ -241,13 +248,11 @@ class _CardTrainingState extends State<_CardTraining> {
 class CustomSidebar extends StatelessWidget {
   late bool isAdmin = false;
 
-  CustomSidebar({
-    super.key
-  });
+  CustomSidebar({super.key});
 
   _loadGyms() async {
     List<AdministratedGym> administratedGyms =
-    await new UserAPI().getAdministatedGyms();
+        await new UserAPI().getAdministatedGyms();
     if (administratedGyms.length > 0) isAdmin = true;
   }
 
@@ -397,7 +402,6 @@ class MenuItems extends StatelessWidget {
     );
   }
 
-
   void _clearSharedPrefs() async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
@@ -406,7 +410,6 @@ class MenuItems extends StatelessWidget {
 }
 
 class _EmptyMenuItems extends StatelessWidget {
-
   _EmptyMenuItems();
 
   @override
@@ -414,8 +417,14 @@ class _EmptyMenuItems extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          leading: const Icon(Icons.home_filled, color: Colors.grey,),
-          title: const Text("Ekran główny", style: TextStyle(color: Colors.grey),),
+          leading: const Icon(
+            Icons.home_filled,
+            color: Colors.grey,
+          ),
+          title: const Text(
+            "Ekran główny",
+            style: TextStyle(color: Colors.grey),
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.calendar_month, color: Colors.grey),
@@ -423,7 +432,8 @@ class _EmptyMenuItems extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.fitness_center, color: Colors.grey),
-          title: const Text("Moje siłownie", style: TextStyle(color: Colors.grey)),
+          title:
+              const Text("Moje siłownie", style: TextStyle(color: Colors.grey)),
         ),
         ListTile(
           leading: const Icon(Icons.settings, color: Colors.grey),
