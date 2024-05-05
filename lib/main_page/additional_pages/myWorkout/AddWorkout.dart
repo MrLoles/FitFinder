@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../API/training/model/Workout.dart';
 import '../../../general/Calendar.dart';
 import '../../../general/LoadingSpinner.dart';
+import '../common/SingleWidgets.dart';
 
 class AddWorkout extends StatelessWidget {
   @override
@@ -258,7 +259,7 @@ class _ExercisesCardsState extends State<ExercisesCards> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return AddDataDialog(
+                    return AddExerciseDialog(
                       onSave: addExerciseToCards,
                     );
                   },
@@ -279,95 +280,6 @@ class _ExercisesCardsState extends State<ExercisesCards> {
     setState(() {
       widget.exerciseList.remove(exercise);
     });
-  }
-}
-
-class AddDataDialog extends StatefulWidget {
-  final Function(Exercise) onSave;
-
-  AddDataDialog({required this.onSave});
-
-  @override
-  _AddDataDialogState createState() => _AddDataDialogState();
-}
-
-class _AddDataDialogState extends State<AddDataDialog> {
-  final _formKey = GlobalKey<FormState>();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController setsController = TextEditingController();
-  TextEditingController repsController = TextEditingController();
-  TextEditingController weightsController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Dodaj ćwiczenie:'),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'Nazwa ćwiczenia'),
-                validator: _textValidator,
-              ),
-              TextFormField(
-                controller: setsController,
-                decoration: InputDecoration(labelText: 'Ilość serii'),
-                validator: _textValidator,
-              ),
-              TextFormField(
-                controller: repsController,
-                decoration: InputDecoration(labelText: 'Ilość powtórzeń'),
-                validator: _textValidator,
-              ),
-              TextFormField(
-                controller: weightsController,
-                decoration: InputDecoration(labelText: 'Obciążenie'),
-                validator: _textValidator,
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('Anuluj'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              String name = nameController.text;
-              String sets = setsController.text;
-              String reps = repsController.text;
-              String weights = weightsController.text;
-
-              widget.onSave(new Exercise(
-                  name: name,
-                  sets: sets,
-                  reps: reps,
-                  weights: weights,
-                  rest: ""));
-
-              Navigator.of(context).pop();
-            }
-          },
-          child: Text('Zapisz'),
-        ),
-      ],
-    );
-  }
-
-  String? _textValidator(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Pole nie może być puste';
-    }
-    return null;
   }
 }
 

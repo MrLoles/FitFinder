@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../API/gym/model/Gym.dart';
+import '../../../API/training/model/Workout.dart';
 
 class GymCard extends StatelessWidget{
   Gym gym;
@@ -61,6 +62,93 @@ class GymCard extends StatelessWidget{
       ),
     );
   }
+}
 
+class AddExerciseDialog extends StatefulWidget {
+  final Function(Exercise) onSave;
 
+  AddExerciseDialog({required this.onSave});
+
+  @override
+  _AddExerciseDialogState createState() => _AddExerciseDialogState();
+}
+
+class _AddExerciseDialogState extends State<AddExerciseDialog> {
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController setsController = TextEditingController();
+  TextEditingController repsController = TextEditingController();
+  TextEditingController weightsController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Dodaj ćwiczenie:'),
+      content: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Nazwa ćwiczenia'),
+                validator: _textValidator,
+              ),
+              TextFormField(
+                controller: setsController,
+                decoration: InputDecoration(labelText: 'Ilość serii'),
+                validator: _textValidator,
+              ),
+              TextFormField(
+                controller: repsController,
+                decoration: InputDecoration(labelText: 'Ilość powtórzeń'),
+                validator: _textValidator,
+              ),
+              TextFormField(
+                controller: weightsController,
+                decoration: InputDecoration(labelText: 'Obciążenie'),
+                validator: _textValidator,
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('Anuluj'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              String name = nameController.text;
+              String sets = setsController.text;
+              String reps = repsController.text;
+              String weights = weightsController.text;
+
+              widget.onSave(new Exercise(
+                  name: name,
+                  sets: sets,
+                  reps: reps,
+                  weights: weights,
+                  rest: ""));
+
+              Navigator.of(context).pop();
+            }
+          },
+          child: Text('Zapisz'),
+        ),
+      ],
+    );
+  }
+
+  String? _textValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Pole nie może być puste';
+    }
+    return null;
+  }
 }
