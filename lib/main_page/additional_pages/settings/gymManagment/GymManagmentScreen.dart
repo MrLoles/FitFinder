@@ -1,4 +1,5 @@
 import 'package:fitfinder/API/gym/GymAPI.dart';
+import 'package:fitfinder/API/gym/model/Contact.dart';
 import 'package:fitfinder/API/gym/model/GymInformationWithEquipment.dart';
 import 'package:fitfinder/API/training/model/Workout.dart';
 import 'package:fitfinder/API/user/model/AdministratedGyms.dart';
@@ -15,6 +16,9 @@ class GymManagmentScreen extends StatefulWidget {
 
   GymManagmentScreen({required this.administratedGym});
 
+  static _GymManagmentScreenState of(BuildContext context) =>
+      context.findAncestorStateOfType<_GymManagmentScreenState>()!;
+
   @override
   State<GymManagmentScreen> createState() => _GymManagmentScreenState();
 }
@@ -22,7 +26,7 @@ class GymManagmentScreen extends StatefulWidget {
 class _GymManagmentScreenState extends State<GymManagmentScreen>
     with SingleTickerProviderStateMixin {
   late _GymEquipment gymEquipment;
-
+  late GymInformation gymInformation = GymInformation.defaultBuilder();
   late TabController _tabController;
 
   @override
@@ -53,7 +57,9 @@ class _GymManagmentScreenState extends State<GymManagmentScreen>
           _AddEquipmentTab(
             gymEquipment: gymEquipment,
           ),
-          _InformationTab(),
+          _InformationTab(
+              gymInformation: gymInformation,
+              gymId: widget.administratedGym.id),
           _TrainingTab(),
         ],
       ),
@@ -134,7 +140,7 @@ class _GymEquipment extends StatefulWidget {
 }
 
 class _GymEquipmentState extends State<_GymEquipment> {
-  late GymInformationWithEquipment gymInformationWithEquipment;
+  late GymInformation gymInformationWithEquipment;
 
   final List<GymEquipment> gymCardioList = [];
   final List<GymEquipment> gymFreeWeightsList = [];
@@ -143,7 +149,9 @@ class _GymEquipmentState extends State<_GymEquipment> {
 
   Future<void> initializelists() async {
     gymInformationWithEquipment =
-        await new GymAPI().getInformationWithEquipment(widget.gymId);
+        await new GymAPI().getGymInformation(widget.gymId);
+
+    GymManagmentScreen.of(context).gymInformation = gymInformationWithEquipment;
 
     gymCardioList.clear();
     gymFreeWeightsList.clear();
@@ -302,9 +310,11 @@ class _TileEquipment extends StatelessWidget {
 }
 
 class _InformationTab extends StatelessWidget {
-  const _InformationTab({
-    super.key,
-  });
+  GymInformation gymInformation;
+  int gymId;
+
+  _InformationTab(
+      {super.key, required this.gymInformation, required this.gymId});
 
   @override
   Widget build(BuildContext context) {
@@ -320,8 +330,9 @@ class _InformationTab extends StatelessWidget {
                   .headlineSmall!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
-            _WorkingHours(),
-            _Contact(),
+            _WorkingHours(gymInformation: gymInformation, gymId: gymId),
+            // _WorkingHours(),
+            _Contact(gymInformation: gymInformation, gymId: gymId),
           ],
         ),
       ),
@@ -329,104 +340,210 @@ class _InformationTab extends StatelessWidget {
   }
 }
 
-class _WorkingHours extends StatelessWidget {
-  _WorkingHours({
-    super.key,
-  });
+class _WorkingHours extends StatefulWidget {
+  GymInformation gymInformation;
+  late List<String>? workingHours;
+  int gymId;
 
-  List<String> workingHours = [
-    "empty", //starts from 1
-    "8:00-23:00",
-    "8:00-23:00",
-    "8:00-23:00",
-    "8:00-23:00",
-    "8:00-23:00",
-    "8:00-18:00",
-    "8:00-16:00"
-  ];
+  // List<String> workingHours = [
+  //   "8:00-23:00",
+  //   "8:00-23:00",
+  //   "8:00-23:00",
+  //   "8:00-23:00",
+  //   "8:00-23:00",
+  //   "8:00-18:00",
+  //   "8:00-16:00"
+  // ];
+
+  _WorkingHours(
+      {super.key, required this.gymInformation, required this.gymId}) {
+    workingHours = gymInformation.openingHours;
+  }
+
+  @override
+  State<_WorkingHours> createState() => _WorkingHoursState();
+}
+
+class _WorkingHoursState extends State<_WorkingHours> {
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 10, bottom: 5),
-      child: Card(
-          margin: EdgeInsets.symmetric(horizontal: 6.0),
-          child: Stack(children: [
-            ListTile(
-              title: Text(
-                "Godziny otwarcia:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Poniedziałek: ${workingHours[1]}"),
-                  Text("Wtorek: ${workingHours[2]}"),
-                  Text("Środa: ${workingHours[3]}"),
-                  Text("Czwartek: ${workingHours[4]}"),
-                  Text("Piątek ${workingHours[5]}"),
-                  Text("Sobota ${workingHours[6]}"),
-                  Text("Niedziela ${workingHours[7]}"),
-                ],
-              ),
-            ),
-            _EditButton(
-                icon: Icons.edit_calendar_outlined,
-                onPressed: () {
-                  showEditOpeningHoursDialog(context, workingHours);
-                }),
-          ])),
-    );
+        margin: EdgeInsets.only(top: 10, bottom: 5),
+        child: Card(
+            margin: EdgeInsets.symmetric(horizontal: 6.0),
+            child: isLoading
+                ? LoadingSpinnerPage()
+                : Stack(children: [
+                    ListTile(
+                        title: Text(
+                          "Godziny otwarcia:",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: () {
+                          if (widget.workingHours != null &&
+                              widget.workingHours!.length > 6) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    "Poniedziałek: ${widget.workingHours![0]}"),
+                                Text("Wtorek: ${widget.workingHours![1]}"),
+                                Text("Środa: ${widget.workingHours![2]}"),
+                                Text("Czwartek: ${widget.workingHours![3]}"),
+                                Text("Piątek: ${widget.workingHours![4]}"),
+                                Text("Sobota: ${widget.workingHours![5]}"),
+                                Text("Niedziela: ${widget.workingHours![6]}"),
+                              ],
+                            );
+                          } else {
+                            return Text(
+                              "Aktualnie nie masz ustawionych\ngodzin otwarcia, aby je ustawić \nkliknij w guzik po prawej stronie",
+                            );
+                          }
+                        }()),
+                    _EditButton(
+                        icon: Icons.edit_calendar_outlined,
+                        onPressed: () {
+                          showEditOpeningHoursDialog(
+                              context, widget.workingHours!);
+                        }),
+                  ])));
   }
 
-  showEditOpeningHoursDialog(BuildContext context, List<String> workingHours) {
+  Future<void> updateGymInformation() async {
+    widget.gymInformation = await new GymAPI().getGymInformation(widget.gymId);
+    setState(() {
+      widget.workingHours = widget.gymInformation.openingHours;
+    });
+  }
+
+  void showEditOpeningHoursDialog(
+      BuildContext context, List<String> workingHours) {
+    TextEditingController mondayController = new TextEditingController();
+    TextEditingController tuesdayController = new TextEditingController();
+    TextEditingController wednesdayController = new TextEditingController();
+    TextEditingController thursdayController = new TextEditingController();
+    TextEditingController fridayController = new TextEditingController();
+    TextEditingController saturdayController = new TextEditingController();
+    TextEditingController sundayController = new TextEditingController();
+
+    void showLoadingDialog() {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return LoadingSpinnerDialog();
+        },
+      );
+    }
+
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Zmień godziny otwarcia"),
-          content: SizedBox(
-            height: 350,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _EditableRowDialog(
-                      name: "Poniedziałek: ", value: workingHours[1]),
-                  _EditableRowDialog(name: "Wtorek: ", value: workingHours[2]),
-                  _EditableRowDialog(name: "Środa: ", value: workingHours[3]),
-                  _EditableRowDialog(
-                      name: "Czwartek: ", value: workingHours[4]),
-                  _EditableRowDialog(name: "Piątek: ", value: workingHours[5]),
-                  _EditableRowDialog(name: "Sobota: ", value: workingHours[6]),
-                  _EditableRowDialog(
-                      name: "Niedziela: ", value: workingHours[7]),
-                ],
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Zmień godziny otwarcia"),
+            content: SizedBox(
+                height: 350,
+                child: () {
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _EditableRowDialog(
+                            name: "Poniedziałek: ",
+                            value: workingHours[0],
+                            controller: mondayController),
+                        _EditableRowDialog(
+                            name: "Wtorek: ",
+                            value: workingHours[1],
+                            controller: tuesdayController),
+                        _EditableRowDialog(
+                            name: "Środa: ",
+                            value: workingHours[2],
+                            controller: wednesdayController),
+                        _EditableRowDialog(
+                            name: "Czwartek: ",
+                            value: workingHours[3],
+                            controller: thursdayController),
+                        _EditableRowDialog(
+                            name: "Piątek: ",
+                            value: workingHours[4],
+                            controller: fridayController),
+                        _EditableRowDialog(
+                            name: "Sobota: ",
+                            value: workingHours[5],
+                            controller: saturdayController),
+                        _EditableRowDialog(
+                            name: "Niedziela: ",
+                            value: workingHours[6],
+                            controller: sundayController),
+                      ],
+                    ),
+                  );
+                }()),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () async {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  Navigator.of(context).pop();
+                  if (mondayController.text.isEmpty)
+                    mondayController.text = workingHours[0];
+                  if (tuesdayController.text.isEmpty)
+                    tuesdayController.text = workingHours[1];
+                  if (wednesdayController.text.isEmpty)
+                    wednesdayController.text = workingHours[2];
+                  if (thursdayController.text.isEmpty)
+                    thursdayController.text = workingHours[3];
+                  if (fridayController.text.isEmpty)
+                    fridayController.text = workingHours[4];
+                  if (saturdayController.text == "")
+                    saturdayController.text = workingHours[5];
+                  if (sundayController.text == "")
+                    sundayController.text = workingHours[6];
+                  await GymAPI().setWorkingHours(
+                    widget.gymId,
+                    mondayController.text,
+                    tuesdayController.text,
+                    wednesdayController.text,
+                    thursdayController.text,
+                    fridayController.text,
+                    saturdayController.text,
+                    sundayController.text,
+                  );
+                  await updateGymInformation();
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+                child: Text('Zapisz'),
               ),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {},
-              child: Text('Zapisz'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Anuluj'),
-            ),
-          ],
-        );
-      },
-    );
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Anuluj'),
+              ),
+            ],
+          );
+        });
   }
 }
 
-class _Contact extends StatelessWidget {
-  const _Contact({
-    super.key,
-  });
+class _Contact extends StatefulWidget {
+  GymInformation gymInformation;
+  int gymId;
 
+  _Contact({super.key, required this.gymInformation, required this.gymId}) {}
+
+  @override
+  State<_Contact> createState() => _ContactState();
+}
+
+class _ContactState extends State<_Contact> {
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).primaryColor;
@@ -435,99 +552,107 @@ class _Contact extends StatelessWidget {
       margin: EdgeInsets.only(top: 10, bottom: 5),
       child: Card(
           margin: EdgeInsets.symmetric(horizontal: 6.0),
-          child: Stack(children: [
+          child: isLoading
+              ? LoadingSpinnerPage()
+              : Stack(children: [
             ListTile(
-              title: Text(
-                "Kontakt:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
+                title: Text(
+                  "Kontakt:",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: () {
+                  if (widget.gymInformation.contact != null) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.mail,
-                          color: primary,
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.mail,
+                                color: primary,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                widget.gymInformation.contact!.email,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(
-                          width: 10,
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.phone,
+                                color: primary,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                widget.gymInformation.contact!.phoneNo,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          "FitTest@gmail.com",
-                          style: Theme.of(context).textTheme.bodyLarge,
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.camera_alt,
+                                color: primary,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                widget.gymInformation.contact!.instagramLink,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.facebook,
+                                color: primary,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                widget.gymInformation.contact!.facebookLink,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.phone,
-                          color: primary,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "+48 777 555 222",
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.camera_alt,
-                          color: primary,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "instagram.com/FitTest",
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.facebook,
-                          color: primary,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          "facebook.com/FitTest",
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                    );
+                  } else {
+                    return Text(
+                        "Ustaw dane do kontaktu klikając w guzik po prawej stronie");
+                  }
+                }()),
             _EditButton(
               icon: Icons.contact_mail,
               onPressed: () {
                 _showEditContactDialog(
                     context,
-                    "temp@gmal.com",
-                    "+48 000 000 000",
-                    "instagram.com/FitTest",
-                    "facebook.com/FitTest");
+                    widget.gymInformation.contact!.email,
+                    widget.gymInformation.contact!.phoneNo,
+                    widget.gymInformation.contact!.instagramLink,
+                    widget.gymInformation.contact!.facebookLink);
               },
             ),
           ])),
@@ -536,6 +661,11 @@ class _Contact extends StatelessWidget {
 
   void _showEditContactDialog(BuildContext context, String mail, String phoneNo,
       String instagramLink, String facebookLink) {
+    TextEditingController emailController = new TextEditingController();
+    TextEditingController phoneNoController = new TextEditingController();
+    TextEditingController instagramController = new TextEditingController();
+    TextEditingController facebookController = new TextEditingController();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -552,18 +682,22 @@ class _Contact extends StatelessWidget {
                   _EditableRowDialogColumns(
                     name: "Email:",
                     value: mail,
+                    controller: emailController,
                   ),
                   _EditableRowDialogColumns(
                     name: "Numer telefonu:",
                     value: phoneNo,
+                    controller: phoneNoController,
                   ),
                   _EditableRowDialogColumns(
                     name: "Instagram:",
                     value: instagramLink,
+                    controller: instagramController,
                   ),
                   _EditableRowDialogColumns(
                     name: "Facebook:",
                     value: facebookLink,
+                    controller: facebookController,
                   ),
                 ],
               ),
@@ -571,7 +705,31 @@ class _Contact extends StatelessWidget {
           ),
           actions: <Widget>[
             TextButton(
-              onPressed: () {},
+              onPressed: () async {
+                setState(() {
+                  isLoading = true;
+                });
+                Navigator.of(context).pop();
+                if (emailController.text.isEmpty) emailController.text = mail;
+                if (phoneNoController.text.isEmpty)
+                  phoneNoController.text = phoneNo;
+                if (instagramController.text.isEmpty)
+                  instagramController.text = instagramLink;
+                if (facebookController.text.isEmpty)
+                  facebookController.text = facebookLink;
+
+                await new GymAPI().setContactData(
+                    widget.gymId,
+                    new Contact(
+                        email: emailController.text,
+                        phoneNo: phoneNoController.text,
+                        instagramLink: instagramController.text,
+                        facebookLink: facebookController.text));
+                await updateGymInformation();
+                setState(() {
+                  isLoading = false;
+                });
+              },
               child: Text('Zapisz'),
             ),
             TextButton(
@@ -584,6 +742,13 @@ class _Contact extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> updateGymInformation() async {
+    widget.gymInformation = await new GymAPI().getGymInformation(widget.gymId);
+    setState(() {
+      widget.gymInformation;
+    });
   }
 }
 
@@ -634,7 +799,7 @@ class _ActionButtonAddEquipment extends StatelessWidget {
 
 class _ActionButtonEditTraining extends StatelessWidget {
   Workout workout =
-  new Workout(dayOfWeek: 1, name: "Trening wprowadzający", exercises: [
+      new Workout(dayOfWeek: 1, name: "Trening wprowadzający", exercises: [
     Exercise(name: "Wyciskanie", sets: "3", reps: "3, 3, 3", weights: "10kg"),
     Exercise(
         name: "Siady",
@@ -650,7 +815,9 @@ class _ActionButtonEditTraining extends StatelessWidget {
         final value = await Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => IntroductionTrainingScreen(workout: workout,)));
+                builder: (context) => IntroductionTrainingScreen(
+                      workout: workout,
+                    )));
         () {};
       },
       shape: CircleBorder(),
@@ -760,14 +927,15 @@ class _EditButton extends StatelessWidget {
 }
 
 class _EditableRowDialog extends StatelessWidget {
-  const _EditableRowDialog({
-    super.key,
-    required this.name,
-    required this.value,
-  });
+  const _EditableRowDialog(
+      {super.key,
+      required this.name,
+      required this.value,
+      required this.controller});
 
   final String name;
   final String value;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -779,7 +947,8 @@ class _EditableRowDialog extends StatelessWidget {
         ),
         SizedBox(
             width: 150,
-            child: TextField(
+            child: TextFormField(
+              controller: controller,
               decoration:
                   InputDecoration(hintText: value, border: InputBorder.none),
             ))
@@ -789,11 +958,14 @@ class _EditableRowDialog extends StatelessWidget {
 }
 
 class _EditableRowDialogColumns extends StatelessWidget {
-  const _EditableRowDialogColumns({
-    Key? key,
-    required this.name,
-    required this.value,
-  }) : super(key: key);
+  final TextEditingController controller;
+
+  const _EditableRowDialogColumns(
+      {Key? key,
+      required this.name,
+      required this.value,
+      required this.controller})
+      : super(key: key);
 
   final String name;
   final String value;
@@ -821,6 +993,7 @@ class _EditableRowDialogColumns extends StatelessWidget {
               textAlign: TextAlign.center,
               decoration:
                   InputDecoration(hintText: value, border: InputBorder.none),
+              controller: controller,
             ),
           ),
         ),

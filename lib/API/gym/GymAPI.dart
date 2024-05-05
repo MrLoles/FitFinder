@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
+import 'package:fitfinder/API/gym/model/Contact.dart';
 import 'package:fitfinder/API/gym/model/Gym.dart';
 import 'package:fitfinder/general/GymEquipmentMap.dart';
 
@@ -44,14 +47,15 @@ class GymAPI {
     }
   }
 
-  Future<GymInformationWithEquipment> getInformationWithEquipment(
+  Future<GymInformation> getGymInformation(
       int gymId) async {
     Response response = await _dio
-        .get(_baseUrl + "/$gymId/getInformationWithEquipment")
+        // .get(_baseUrl + "/$gymId/getInformationWithEquipment")
+        .get("http://10.0.2.2:8081/gym/1/getGymInformation")
         .timeout(Duration(seconds: timeout));
 
     if (response.statusCode == 200) {
-      return GymInformationWithEquipment.fromJson(response.data);
+      return GymInformation.fromJson(response.data);
     } else {
       throw Exception('Request failed with status: ${response.statusCode}');
     }
@@ -81,6 +85,43 @@ class GymAPI {
 
     Response response = await _dio
         .post(_baseUrl + "/$gymId/addEquipment", data: data)
+        .timeout(Duration(seconds: timeout));
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}');
+    }
+  }
+
+  Future<bool> setWorkingHours(int gymId, String monday, String tuesday, String wednesday, String thursday, String friday, String saturday, String sunday) async {
+
+    List<String> data = [monday, tuesday, wednesday, thursday, friday, saturday, sunday];
+
+    Response response = await _dio
+        // .post(_baseUrl + "/$gymId/workingHours", data: data)\
+        .post("http://10.0.2.2:8081/gym/1/workingHours", data: json.encode(data))
+        .timeout(Duration(seconds: timeout));
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}');
+    }
+  }
+
+  Future<bool> setContactData(int gymId, Contact contact) async {
+
+    var data = {
+      'email': contact.email,
+      'phoneNo': contact.phoneNo,
+      'instagramLink': contact.instagramLink,
+      'facebookLink': contact.facebookLink
+    };
+
+    Response response = await _dio
+    // .post(_baseUrl + "/$gymId/contact", data: data)\
+        .post("http://10.0.2.2:8081/gym/1/contact", data: json.encode(data))
         .timeout(Duration(seconds: timeout));
 
     if (response.statusCode == 200) {

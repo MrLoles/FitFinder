@@ -46,7 +46,7 @@ class GymCard extends StatelessWidget{
                                 .titleSmall!
                                 .color)),
                     TextSpan(
-                        text: gym.openingHours![DateTime.now().weekday],
+                        text: gym.openingHours![DateTime.now().weekday - 1],
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context)
