@@ -60,7 +60,7 @@ class _GymManagmentScreenState extends State<GymManagmentScreen>
           _InformationTab(
               gymInformation: gymInformation,
               gymId: widget.administratedGym.id),
-          _TrainingTab(),
+          _TrainingTab(workout: gymInformation.workout!,),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -94,7 +94,7 @@ class _GymManagmentScreenState extends State<GymManagmentScreen>
           );
         else if (_tabController.index == 1)
           return _ActionButtonSave();
-        else if (_tabController.index == 2) return _ActionButtonEditTraining();
+        else if (_tabController.index == 2) return _ActionButtonEditTraining(workout: gymInformation.workout!);
       }(),
     );
   }
@@ -148,10 +148,14 @@ class _GymEquipmentState extends State<_GymEquipment> {
   final List<GymEquipment> gymAccessoriesList = [];
 
   Future<void> initializelists() async {
-    gymInformationWithEquipment =
-        await new GymAPI().getGymInformation(widget.gymId);
+    try{
+      gymInformationWithEquipment =
+      await new GymAPI().getGymInformation(widget.gymId);
+    } catch (e){}
 
     GymManagmentScreen.of(context).gymInformation = gymInformationWithEquipment;
+
+    print("test " + gymInformationWithEquipment.workout!.exercises[0].name);
 
     gymCardioList.clear();
     gymFreeWeightsList.clear();
@@ -798,15 +802,10 @@ class _ActionButtonAddEquipment extends StatelessWidget {
 }
 
 class _ActionButtonEditTraining extends StatelessWidget {
-  Workout workout =
-      new Workout(dayOfWeek: 1, name: "Trening wprowadzający", exercises: [
-    Exercise(name: "Wyciskanie", sets: "3", reps: "3, 3, 3", weights: "10kg"),
-    Exercise(
-        name: "Siady",
-        sets: "5",
-        reps: "10, 10, 10, 10, 10",
-        weights: "40kg, 60kg, 60kg, 40kg, 40kg")
-  ]);
+
+  _ActionButtonEditTraining({required this.workout}){}
+
+  Workout workout;
 
   @override
   Widget build(BuildContext context) {
@@ -831,15 +830,10 @@ class _ActionButtonEditTraining extends StatelessWidget {
 }
 
 class _TrainingTab extends StatelessWidget {
-  Workout workout =
-      new Workout(dayOfWeek: 1, name: "Trening wprowadzający", exercises: [
-    Exercise(name: "Wyciskanie", sets: "3", reps: "3, 3, 3", weights: "10kg"),
-    Exercise(
-        name: "Siady",
-        sets: "5",
-        reps: "10, 10, 10, 10, 10",
-        weights: "40kg, 60kg, 60kg, 40kg, 40kg")
-  ]);
+
+  _TrainingTab({required this.workout});
+
+  Workout workout;
 
   @override
   Widget build(BuildContext context) {

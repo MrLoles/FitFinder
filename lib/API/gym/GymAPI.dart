@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:fitfinder/API/gym/model/Contact.dart';
 import 'package:fitfinder/API/gym/model/Gym.dart';
+import 'package:fitfinder/API/training/model/Workout.dart';
 import 'package:fitfinder/general/GymEquipmentMap.dart';
 
 import 'model/GymInformationWithEquipment.dart';
@@ -53,7 +54,7 @@ class GymAPI {
         // .get(_baseUrl + "/$gymId/getInformationWithEquipment")
         .get("http://10.0.2.2:8081/gym/1/getGymInformation")
         .timeout(Duration(seconds: timeout));
-
+    print(response.data);
     if (response.statusCode == 200) {
       return GymInformation.fromJson(response.data);
     } else {
@@ -122,6 +123,25 @@ class GymAPI {
     Response response = await _dio
     // .post(_baseUrl + "/$gymId/contact", data: data)\
         .post("http://10.0.2.2:8081/gym/1/contact", data: json.encode(data))
+        .timeout(Duration(seconds: timeout));
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Request failed with status: ${response.statusCode}');
+    }
+  }
+
+  Future<bool> setTraining(int gymId, Workout workout) async {
+
+    var data = {
+      'name': gymId.toString(),
+      'exercises': workout.exercises,
+    };
+
+    Response response = await _dio
+    // .post(_baseUrl + "/$gymId/training", data: data)\
+        .post("http://10.0.2.2:8081/gym/1/training", data: json.encode(data))
         .timeout(Duration(seconds: timeout));
 
     if (response.statusCode == 200) {
