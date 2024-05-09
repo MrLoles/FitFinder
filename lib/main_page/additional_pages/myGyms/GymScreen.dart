@@ -1,8 +1,11 @@
 import 'package:fitfinder/API/gym/GymAPI.dart';
+import 'package:fitfinder/API/gym/model/Contact.dart';
+import 'package:fitfinder/API/gym/model/GymInformationWithEquipment.dart';
 import 'package:fitfinder/API/user/UserAPI.dart';
 import 'package:flutter/material.dart';
 
 import '../../../API/gym/model/Gym.dart';
+import '../../../API/training/model/Workout.dart';
 import '../../../general/LoadingSpinner.dart';
 import '../common/AdditionalScreenScaffold.dart';
 
@@ -22,12 +25,13 @@ class _GymScreenState extends State<GymScreen>
     with SingleTickerProviderStateMixin {
   bool isLiked = false;
   late TabController _tabController;
+  late GymInformation gymInformation;
 
   @override
   void initState() {
     fetchFavouriteStatus();
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabSelection);
   }
 
@@ -58,13 +62,29 @@ class _GymScreenState extends State<GymScreen>
           ),
         ],
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _GeneralInfoTab(),
-          _GymEquipmentTab(gym: widget.gym),
-        ],
-      ),
+      body: FutureBuilder(
+          future: _getGymInformations(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return Center(child: LoadingSpinnerPage());
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Ups, coś poszło nie tak :("));
+            } else {
+              return TabBarView(
+                controller: _tabController,
+                children: [
+                  _GeneralInfoTab(
+                    workingHours: gymInformation.openingHours,
+                    contact: gymInformation.contact,
+                  ),
+                  _GymEquipmentTab(gym: widget.gym),
+                  _TrainingTab(
+                      workout:
+                          gymInformation.workout ?? Workout.defaultBuilder()),
+                ],
+              );
+            }
+          }),
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
@@ -74,6 +94,10 @@ class _GymScreenState extends State<GymScreen>
           BottomNavigationBarItem(
             icon: Icon(Icons.fitness_center),
             label: 'Wyposażenie',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.accessibility_new),
+            label: 'Trening',
           ),
         ],
         currentIndex: _tabController.index,
@@ -115,6 +139,71 @@ class _GymScreenState extends State<GymScreen>
         throw Exception('Failed to load favourite status');
       }
     } catch (e) {}
+  }
+
+  _getGymInformations() async {
+    gymInformation = await new GymAPI().getGymInformation(widget.gym.id);
+  }
+}
+
+class _TrainingTab extends StatelessWidget {
+  _TrainingTab({required this.workout});
+
+  Workout? workout;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Container(
+        margin: EdgeInsets.only(top: 20),
+        child: Text("Trening wprowadzający:",
+            style: Theme.of(context).textTheme.headlineSmall),
+      ),
+      SizedBox(
+        height: 5,
+      ),
+      Container(
+          padding: EdgeInsets.only(left: 20, right: 20),
+          child: Container(
+            child: Card(
+              elevation: 3,
+              margin: EdgeInsets.all(10),
+              child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  child: () {
+                    if (workout == null) {
+                      return Text("Ups, coś poszło nie tak");
+                    } else if (workout!.exercises.length >= 1) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: workout!.exercises.map((exercise) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${exercise.name}'.toUpperCase(),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text('Serie: ${exercise.sets}'),
+                              Text(
+                                  'Powtórzenia: ${exercise.reps.toString().replaceAll("[", "").replaceAll("]", "")}'),
+                              Text('Obciążenie: ${exercise.weights}'),
+                              Divider(),
+                              SizedBox(
+                                height: 5,
+                              )
+                            ],
+                          );
+                        }).toList(),
+                      );
+                    } else if (workout!.exercises.length == 0) {
+                      return Text("Brak treningu wprowadzającego!");
+                    }
+                  }()),
+            ),
+          ))
+    ]);
   }
 }
 
@@ -197,9 +286,11 @@ class _GymEquipmentTabState extends State<_GymEquipmentTab> {
 }
 
 class _GeneralInfoTab extends StatelessWidget {
-  const _GeneralInfoTab({
-    super.key,
-  });
+  List<String>? workingHours;
+  Contact? contact;
+
+  _GeneralInfoTab(
+      {super.key, required this.workingHours, required this.contact});
 
   @override
   Widget build(BuildContext context) {
@@ -215,8 +306,12 @@ class _GeneralInfoTab extends StatelessWidget {
                   .headlineSmall!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
-            _WorkingHours(),
-            _Contact(),
+            _WorkingHours(
+              workingHours: workingHours,
+            ),
+            _Contact(
+              contact: contact,
+            ),
           ],
         ),
       ),
@@ -225,9 +320,9 @@ class _GeneralInfoTab extends StatelessWidget {
 }
 
 class _WorkingHours extends StatelessWidget {
-  const _WorkingHours({
-    super.key,
-  });
+  List<String>? workingHours;
+
+  _WorkingHours({super.key, required this.workingHours});
 
   @override
   Widget build(BuildContext context) {
@@ -236,31 +331,32 @@ class _WorkingHours extends StatelessWidget {
       child: Card(
           margin: EdgeInsets.symmetric(horizontal: 6.0),
           child: ListTile(
-            title: Text(
-              "Godziny otwarcia:",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Poniedziałek: 8:00-23:00"),
-                Text("Wtorek: 8:00-23:00"),
-                Text("Środa: 8:00-23:00"),
-                Text("Czwartek: 8:00-23:00"),
-                Text("Piątek 8:00-22:00"),
-                Text("Sobota 8:00-16:00"),
-                Text("Niedziela 8:00-16:00"),
-              ],
-            ),
-          )),
+              title: Text(
+                "Godziny otwarcia:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: (workingHours != null && workingHours!.length > 0)
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Poniedziałek: ${workingHours![0]}"),
+                        Text("Wtorek: ${workingHours![1]}"),
+                        Text("Środa: ${workingHours![2]}"),
+                        Text("Czwartek: ${workingHours![3]}"),
+                        Text("Piątek ${workingHours![4]}"),
+                        Text("Sobota ${workingHours![5]}"),
+                        Text("Niedziela ${workingHours![6]}"),
+                      ],
+                    )
+                  : Text("Brak godzin otwarcia"))),
     );
   }
 }
 
 class _Contact extends StatelessWidget {
-  const _Contact({
-    super.key,
-  });
+  Contact? contact;
+
+  _Contact({super.key, required this.contact});
 
   @override
   Widget build(BuildContext context) {
@@ -271,88 +367,89 @@ class _Contact extends StatelessWidget {
       child: Card(
           margin: EdgeInsets.symmetric(horizontal: 6.0),
           child: ListTile(
-            title: Text(
-              "Kontakt:",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 2),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.mail,
-                        color: primary,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "FitTest@gmail.com",
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 2),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.phone,
-                        color: primary,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "+48 777 555 222",
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 2),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.camera_alt,
-                        color: primary,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "instagram.com/FitTest",
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 2),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.facebook,
-                        color: primary,
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        "facebook.com/FitTest",
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          )),
+              title: Text(
+                "Kontakt:",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: (contact != null)
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.mail,
+                                color: primary,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                contact!.email,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.phone,
+                                color: primary,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                contact!.phoneNo,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.camera_alt,
+                                color: primary,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                contact!.instagramLink,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.facebook,
+                                color: primary,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                contact!.facebookLink,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text("Brak danych kontaktowych"))),
     );
   }
 }

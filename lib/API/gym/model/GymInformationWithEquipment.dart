@@ -1,24 +1,46 @@
+import '../../training/model/Workout.dart';
+import 'Contact.dart';
 import 'Gym.dart';
 
-class GymInformationWithEquipment {
+class GymInformation {
   String gymName;
   Address address;
   List<String>? openingHours;
   List<GymEquipment> gymEquipmentList;
+  Contact? contact;
+  Workout? workout;
 
-  GymInformationWithEquipment({
-    required this.gymName,
-    required this.address,
-    this.openingHours,
-    required this.gymEquipmentList,
-  });
+  GymInformation(
+      {required this.gymName,
+      required this.address,
+      this.openingHours,
+      required this.gymEquipmentList,
+      this.contact,
+      this.workout});
 
-  factory GymInformationWithEquipment.fromJson(Map<String, dynamic> json) =>
-      GymInformationWithEquipment(
+  factory GymInformation.fromJson(Map<String, dynamic> json) {
+    return GymInformation(
         gymName: json['gymName'],
         address: Address.fromJson(json['address']),
         openingHours: List<String>.from(json['openingHours'] ?? []),
         gymEquipmentList: List<GymEquipment>.from(
             json['gymEquipmentList'].map((x) => GymEquipment.fromJson(x))),
-      );
+        contact:
+            json['contact'] != null ? Contact.fromJson(json['contact']) : null,
+        workout: json['training'] != null
+            ? Workout.fromJson(json['training'])
+            : null);
+  }
+
+  factory GymInformation.defaultBuilder() => GymInformation(
+          gymName: "temp",
+          address: Address(country: "test", city: "test", street: "test"),
+          gymEquipmentList: [
+            GymEquipment(
+                id: 1,
+                name: "name",
+                category: "category",
+                description: "description",
+                quantity: 1)
+          ]);
 }

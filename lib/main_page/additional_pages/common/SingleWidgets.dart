@@ -46,7 +46,7 @@ class GymCard extends StatelessWidget{
                                 .titleSmall!
                                 .color)),
                     TextSpan(
-                        text: gym.openingHours![DateTime.now().weekday],
+                        text: gym.openingHours![DateTime.now().weekday - 1],
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context)
@@ -133,8 +133,7 @@ class _AddExerciseDialogState extends State<AddExerciseDialog> {
                   name: name,
                   sets: sets,
                   reps: reps,
-                  weights: weights,
-                  rest: ""));
+                  weights: weights));
 
               Navigator.of(context).pop();
             }

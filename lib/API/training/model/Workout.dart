@@ -4,16 +4,19 @@ class Exercise {
   String sets;
   String reps;
   String weights;
-  String? rest;
+  String rest;
 
-  Exercise({required this.name, required this.sets, required this.reps, required this.weights, this.rest});
+  Exercise({required this.name, required this.sets, required this.reps, required this.weights, this.rest = "0"});
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
+    String localRest = (json['rest'] == null || json['rest'] == "null" || json['rest'] == "") ? "null" : json['rest'];
+
     return Exercise(
       name: json['name'],
       sets: json['sets'],
       reps: json['reps'],
       weights: json['weights'],
+        rest: localRest
     );
   }
 
@@ -23,6 +26,7 @@ class Exercise {
       "sets": sets,
       "reps": reps,
       "weights": weights,
+      "rest": rest,
     };
   }
 }
@@ -52,5 +56,9 @@ class Workout {
       "name": name,
       "exercises": exercisesJson
     };
+  }
+
+  factory Workout.defaultBuilder(){
+    return new Workout(dayOfWeek: 0, name: "notYet", exercises: []);
   }
 }
