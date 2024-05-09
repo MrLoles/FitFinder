@@ -133,8 +133,7 @@ class _AddExerciseDialogState extends State<AddExerciseDialog> {
                   name: name,
                   sets: sets,
                   reps: reps,
-                  weights: weights,
-                  rest: ""));
+                  weights: weights));
 
               Navigator.of(context).pop();
             }

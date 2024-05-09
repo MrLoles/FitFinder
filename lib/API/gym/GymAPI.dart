@@ -48,13 +48,10 @@ class GymAPI {
     }
   }
 
-  Future<GymInformation> getGymInformation(
-      int gymId) async {
+  Future<GymInformation> getGymInformation(int gymId) async {
     Response response = await _dio
-        // .get(_baseUrl + "/$gymId/getInformationWithEquipment")
-        .get("http://10.0.2.2:8081/gym/1/getGymInformation")
+        .get(_baseUrl + "/$gymId/getGymInformation")
         .timeout(Duration(seconds: timeout));
-    print(response.data);
     if (response.statusCode == 200) {
       return GymInformation.fromJson(response.data);
     } else {
@@ -95,13 +92,27 @@ class GymAPI {
     }
   }
 
-  Future<bool> setWorkingHours(int gymId, String monday, String tuesday, String wednesday, String thursday, String friday, String saturday, String sunday) async {
-
-    List<String> data = [monday, tuesday, wednesday, thursday, friday, saturday, sunday];
+  Future<bool> setWorkingHours(
+      int gymId,
+      String monday,
+      String tuesday,
+      String wednesday,
+      String thursday,
+      String friday,
+      String saturday,
+      String sunday) async {
+    List<String> data = [
+      monday,
+      tuesday,
+      wednesday,
+      thursday,
+      friday,
+      saturday,
+      sunday
+    ];
 
     Response response = await _dio
-        // .post(_baseUrl + "/$gymId/workingHours", data: data)\
-        .post("http://10.0.2.2:8081/gym/1/workingHours", data: json.encode(data))
+        .post(_baseUrl + "/$gymId/workingHours", data: json.encode(data))
         .timeout(Duration(seconds: timeout));
 
     if (response.statusCode == 200) {
@@ -112,7 +123,6 @@ class GymAPI {
   }
 
   Future<bool> setContactData(int gymId, Contact contact) async {
-
     var data = {
       'email': contact.email,
       'phoneNo': contact.phoneNo,
@@ -121,8 +131,7 @@ class GymAPI {
     };
 
     Response response = await _dio
-    // .post(_baseUrl + "/$gymId/contact", data: data)\
-        .post("http://10.0.2.2:8081/gym/1/contact", data: json.encode(data))
+        .post(_baseUrl + "/$gymId/contact", data: json.encode(data))
         .timeout(Duration(seconds: timeout));
 
     if (response.statusCode == 200) {
@@ -132,16 +141,18 @@ class GymAPI {
     }
   }
 
-  Future<bool> setTraining(int gymId, Workout workout) async {
+  Future<bool> setTraining(
+      int gymId, String gymName, List<Exercise> exercises) async {
+    List<Map<String, dynamic>> exercisesJson =
+        exercises.map((e) => e.toJson()).toList();
 
     var data = {
-      'name': gymId.toString(),
-      'exercises': workout.exercises,
+      'name': gymName,
+      'exercises': exercisesJson,
     };
 
     Response response = await _dio
-    // .post(_baseUrl + "/$gymId/training", data: data)\
-        .post("http://10.0.2.2:8081/gym/1/training", data: json.encode(data))
+        .post(_baseUrl + "/$gymId/training", data: jsonEncode(data))
         .timeout(Duration(seconds: timeout));
 
     if (response.statusCode == 200) {

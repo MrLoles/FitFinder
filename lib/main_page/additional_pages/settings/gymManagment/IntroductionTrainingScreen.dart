@@ -1,3 +1,4 @@
+import 'package:fitfinder/API/gym/GymAPI.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,8 +8,10 @@ import '../../common/SingleWidgets.dart';
 
 class IntroductionTrainingScreen extends StatefulWidget {
   Workout workout;
+  String gymName;
+  int gymId;
 
-  IntroductionTrainingScreen({required this.workout});
+  IntroductionTrainingScreen({required this.gymId, required this.workout, required this.gymName});
 
   @override
   State<IntroductionTrainingScreen> createState() =>
@@ -39,7 +42,10 @@ class _IntroductionTrainingScreenState
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 10, horizontal: 30),
-                    child: Column(
+                    child: (widget.workout.exercises.length == 0) ?
+                    Center(child: Text("Brak ćwiczeń"))
+                        :
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: widget.workout.exercises.map((exercise) {
                         return Stack(children: [
@@ -104,16 +110,23 @@ class _IntroductionTrainingScreenState
             ),
           )
         ]),
-        floatingActionButton: _ActionButtonAddEquipment());
+        floatingActionButton: _ActionButtonAddEquipment(widget.gymId, widget.workout, widget.gymName));
   }
 }
 
 class _ActionButtonAddEquipment extends StatelessWidget {
+  Workout workout;
+  String gymName;
+  int gymId;
+
+  _ActionButtonAddEquipment(this.gymId, this.workout, this.gymName);
+
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
       onPressed: () {
-
+        new GymAPI().setTraining(gymId, gymName, workout.exercises);
+        Navigator.of(context).pop();
       },
       shape: CircleBorder(),
       child: Icon(

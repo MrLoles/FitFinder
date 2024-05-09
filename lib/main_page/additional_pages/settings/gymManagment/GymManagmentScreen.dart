@@ -28,6 +28,7 @@ class _GymManagmentScreenState extends State<GymManagmentScreen>
   late _GymEquipment gymEquipment;
   late GymInformation gymInformation = GymInformation.defaultBuilder();
   late TabController _tabController;
+  late Workout workout = Workout.defaultBuilder();
 
   @override
   void initState() {
@@ -60,7 +61,9 @@ class _GymManagmentScreenState extends State<GymManagmentScreen>
           _InformationTab(
               gymInformation: gymInformation,
               gymId: widget.administratedGym.id),
-          _TrainingTab(workout: gymInformation.workout!,),
+          _TrainingTab(
+            workout: workout,
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -86,7 +89,6 @@ class _GymManagmentScreenState extends State<GymManagmentScreen>
         },
       ),
       floatingActionButton: () {
-        print(_tabController.index);
         if (_tabController.index == 0)
           return _ActionButtonAddEquipment(
             gymEquipment: gymEquipment,
@@ -94,7 +96,11 @@ class _GymManagmentScreenState extends State<GymManagmentScreen>
           );
         else if (_tabController.index == 1)
           return _ActionButtonSave();
-        else if (_tabController.index == 2) return _ActionButtonEditTraining(workout: gymInformation.workout!);
+        else if (_tabController.index == 2)
+          return _ActionButtonEditTraining(
+              gymId: widget.administratedGym.id,
+              workout: workout,
+              gymName: gymInformation.gymName);
       }(),
     );
   }
@@ -141,28 +147,36 @@ class _GymEquipment extends StatefulWidget {
 
 class _GymEquipmentState extends State<_GymEquipment> {
   late GymInformation gymInformationWithEquipment;
+  late Future<void> _initFuture;
 
   final List<GymEquipment> gymCardioList = [];
   final List<GymEquipment> gymFreeWeightsList = [];
   final List<GymEquipment> gymMachinesList = [];
   final List<GymEquipment> gymAccessoriesList = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _initFuture = initializelists();
+  }
+
   Future<void> initializelists() async {
-    try{
+    List<GymEquipment> gymEquipmentList = [];
+    try {
       gymInformationWithEquipment =
-      await new GymAPI().getGymInformation(widget.gymId);
-    } catch (e){}
+          await new GymAPI().getGymInformation(widget.gymId);
+      GymManagmentScreen.of(context).gymInformation =
+          gymInformationWithEquipment;
+      GymManagmentScreen.of(context).workout =
+          gymInformationWithEquipment.workout ?? Workout.defaultBuilder();
 
-    GymManagmentScreen.of(context).gymInformation = gymInformationWithEquipment;
-
-    print("test " + gymInformationWithEquipment.workout!.exercises[0].name);
+      gymEquipmentList = gymInformationWithEquipment.gymEquipmentList;
+    } catch (e) {}
 
     gymCardioList.clear();
     gymFreeWeightsList.clear();
     gymMachinesList.clear();
     gymAccessoriesList.clear();
-    List<GymEquipment> gymEquipmentList =
-        gymInformationWithEquipment.gymEquipmentList;
     gymEquipmentList.forEach((equipment) {
       if (equipment.category == "Cardio")
         gymCardioList.add(equipment);
@@ -214,6 +228,12 @@ class _GymEquipmentState extends State<_GymEquipment> {
             );
           }
         });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _initFuture = initializelists(); // Refresh data when dependencies change
   }
 }
 
@@ -451,6 +471,16 @@ class _WorkingHoursState extends State<_WorkingHours> {
             content: SizedBox(
                 height: 350,
                 child: () {
+                  if (workingHours.length == 0)
+                    workingHours = [
+                      "0:00-0:00",
+                      "0:00-0:00",
+                      "0:00-0:00",
+                      "0:00-0:00",
+                      "0:00-0:00",
+                      "0:00-0:00",
+                      "0:00-0:00"
+                    ];
                   return SingleChildScrollView(
                     child: Column(
                       children: [
@@ -489,10 +519,6 @@ class _WorkingHoursState extends State<_WorkingHours> {
             actions: <Widget>[
               TextButton(
                 onPressed: () async {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  Navigator.of(context).pop();
                   if (mondayController.text.isEmpty)
                     mondayController.text = workingHours[0];
                   if (tuesdayController.text.isEmpty)
@@ -503,24 +529,38 @@ class _WorkingHoursState extends State<_WorkingHours> {
                     thursdayController.text = workingHours[3];
                   if (fridayController.text.isEmpty)
                     fridayController.text = workingHours[4];
-                  if (saturdayController.text == "")
+                  if (saturdayController.text == "") {
                     saturdayController.text = workingHours[5];
+                  }
                   if (sundayController.text == "")
                     sundayController.text = workingHours[6];
-                  await GymAPI().setWorkingHours(
-                    widget.gymId,
-                    mondayController.text,
-                    tuesdayController.text,
-                    wednesdayController.text,
-                    thursdayController.text,
-                    fridayController.text,
-                    saturdayController.text,
-                    sundayController.text,
-                  );
-                  await updateGymInformation();
-                  setState(() {
-                    isLoading = false;
-                  });
+
+                  if (mondayController.text != "0:00-0:00" &&
+                      tuesdayController.text != "0:00-0:00" &&
+                      wednesdayController.text != "0:00-0:00" &&
+                      thursdayController.text != "0:00-0:00" &&
+                      fridayController.text != "0:00-0:00" &&
+                      saturdayController.text != "0:00-0:00" &&
+                      sundayController.text != "0:00-0:00") {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    Navigator.of(context).pop();
+                    await GymAPI().setWorkingHours(
+                      widget.gymId,
+                      mondayController.text,
+                      tuesdayController.text,
+                      wednesdayController.text,
+                      thursdayController.text,
+                      fridayController.text,
+                      saturdayController.text,
+                      sundayController.text,
+                    );
+                    await updateGymInformation();
+                    setState(() {
+                      isLoading = false;
+                    });
+                  }
                 },
                 child: Text('Zapisz'),
               ),
@@ -548,6 +588,7 @@ class _Contact extends StatefulWidget {
 
 class _ContactState extends State<_Contact> {
   bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     Color primary = Theme.of(context).primaryColor;
@@ -559,107 +600,117 @@ class _ContactState extends State<_Contact> {
           child: isLoading
               ? LoadingSpinnerPage()
               : Stack(children: [
-            ListTile(
-                title: Text(
-                  "Kontakt:",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: () {
-                  if (widget.gymInformation.contact != null) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
+                  ListTile(
+                      title: Text(
+                        "Kontakt:",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: () {
+                        if (widget.gymInformation.contact != null) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                Icons.mail,
-                                color: primary,
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 2),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.mail,
+                                      color: primary,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      widget.gymInformation.contact!.email,
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              SizedBox(
-                                width: 10,
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 2),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.phone,
+                                      color: primary,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      widget.gymInformation.contact!.phoneNo,
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ],
+                                ),
                               ),
-                              Text(
-                                widget.gymInformation.contact!.email,
-                                style: Theme.of(context).textTheme.bodyLarge,
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 2),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.camera_alt,
+                                      color: primary,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      widget.gymInformation.contact!
+                                          .instagramLink,
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 2),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.facebook,
+                                      color: primary,
+                                    ),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      widget
+                                          .gymInformation.contact!.facebookLink,
+                                      style:
+                                          Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.phone,
-                                color: primary,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                widget.gymInformation.contact!.phoneNo,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.camera_alt,
-                                color: primary,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                widget.gymInformation.contact!.instagramLink,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.facebook,
-                                color: primary,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                widget.gymInformation.contact!.facebookLink,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Text(
-                        "Ustaw dane do kontaktu klikając w guzik po prawej stronie");
-                  }
-                }()),
-            _EditButton(
-              icon: Icons.contact_mail,
-              onPressed: () {
-                _showEditContactDialog(
-                    context,
-                    widget.gymInformation.contact!.email,
-                    widget.gymInformation.contact!.phoneNo,
-                    widget.gymInformation.contact!.instagramLink,
-                    widget.gymInformation.contact!.facebookLink);
-              },
-            ),
-          ])),
+                          );
+                        } else {
+                          return Text(
+                              "Ustaw dane do kontaktu klikając \nw guzik po prawej stronie");
+                        }
+                      }()),
+                  _EditButton(
+                    icon: Icons.contact_mail,
+                    onPressed: () {
+                      if (widget.gymInformation.contact == null) {
+                        _showEditContactDialog(context, "", "", "", "");
+                      } else {
+                        _showEditContactDialog(
+                            context,
+                            widget.gymInformation.contact!.email,
+                            widget.gymInformation.contact!.phoneNo,
+                            widget.gymInformation.contact!.instagramLink,
+                            widget.gymInformation.contact!.facebookLink);
+                      }
+                    },
+                  ),
+                ])),
     );
   }
 
@@ -710,10 +761,6 @@ class _ContactState extends State<_Contact> {
           actions: <Widget>[
             TextButton(
               onPressed: () async {
-                setState(() {
-                  isLoading = true;
-                });
-                Navigator.of(context).pop();
                 if (emailController.text.isEmpty) emailController.text = mail;
                 if (phoneNoController.text.isEmpty)
                   phoneNoController.text = phoneNo;
@@ -721,18 +768,26 @@ class _ContactState extends State<_Contact> {
                   instagramController.text = instagramLink;
                 if (facebookController.text.isEmpty)
                   facebookController.text = facebookLink;
-
-                await new GymAPI().setContactData(
-                    widget.gymId,
-                    new Contact(
-                        email: emailController.text,
-                        phoneNo: phoneNoController.text,
-                        instagramLink: instagramController.text,
-                        facebookLink: facebookController.text));
-                await updateGymInformation();
-                setState(() {
-                  isLoading = false;
-                });
+                if (facebookController.text != "" &&
+                    instagramController.text != "" &&
+                    phoneNoController.text != "" &&
+                    emailController.text != "") {
+                  setState(() {
+                    isLoading = true;
+                  });
+                  Navigator.of(context).pop();
+                  await new GymAPI().setContactData(
+                      widget.gymId,
+                      new Contact(
+                          email: emailController.text,
+                          phoneNo: phoneNoController.text,
+                          instagramLink: instagramController.text,
+                          facebookLink: facebookController.text));
+                  await updateGymInformation();
+                  setState(() {
+                    isLoading = false;
+                  });
+                } else {}
               },
               child: Text('Zapisz'),
             ),
@@ -801,12 +856,20 @@ class _ActionButtonAddEquipment extends StatelessWidget {
   }
 }
 
-class _ActionButtonEditTraining extends StatelessWidget {
+class _ActionButtonEditTraining extends StatefulWidget {
+  _ActionButtonEditTraining(
+      {required this.gymId, required this.workout, required this.gymName}) {}
 
-  _ActionButtonEditTraining({required this.workout}){}
+  int gymId;
+  String gymName;
+  Workout? workout;
 
-  Workout workout;
+  @override
+  State<_ActionButtonEditTraining> createState() =>
+      _ActionButtonEditTrainingState();
+}
 
+class _ActionButtonEditTrainingState extends State<_ActionButtonEditTraining> {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton(
@@ -815,9 +878,13 @@ class _ActionButtonEditTraining extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (context) => IntroductionTrainingScreen(
-                      workout: workout,
+                      workout: widget.workout!,
+                      gymName: widget.gymName,
+                      gymId: widget.gymId,
                     )));
-        () {};
+        () {
+          GymManagmentScreen.of(context).setState(() {});
+        }();
       },
       shape: CircleBorder(),
       child: Icon(
@@ -830,10 +897,9 @@ class _ActionButtonEditTraining extends StatelessWidget {
 }
 
 class _TrainingTab extends StatelessWidget {
-
   _TrainingTab({required this.workout});
 
-  Workout workout;
+  Workout? workout;
 
   @override
   Widget build(BuildContext context) {
@@ -853,31 +919,38 @@ class _TrainingTab extends StatelessWidget {
               elevation: 3,
               margin: EdgeInsets.all(10),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: workout.exercises.map((exercise) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${exercise.name}'.toUpperCase(),
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text('Serie: ${exercise.sets}'),
-                        Text(
-                            'Powtórzenia: ${exercise.reps.toString().replaceAll("[", "").replaceAll("]", "")}'),
-                        Text('Obciążenie: ${exercise.weights}'),
-                        Divider(),
-                        SizedBox(
-                          height: 5,
-                        )
-                      ],
-                    );
-                  }).toList(),
-                ),
-              ),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  child: () {
+                    if (workout == null) {
+                      return Text("Ups, coś poszło nie tak");
+                    } else if (workout!.exercises.length >= 1) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: workout!.exercises.map((exercise) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${exercise.name}'.toUpperCase(),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text('Serie: ${exercise.sets}'),
+                              Text(
+                                  'Powtórzenia: ${exercise.reps.toString().replaceAll("[", "").replaceAll("]", "")}'),
+                              Text('Obciążenie: ${exercise.weights}'),
+                              Divider(),
+                              SizedBox(
+                                height: 5,
+                              )
+                            ],
+                          );
+                        }).toList(),
+                      );
+                    } else if (workout!.exercises.length == 0) {
+                      return Text("Brak treningu wprowadzającego!");
+                    }
+                  }()),
             ),
           ))
     ]);
@@ -962,7 +1035,7 @@ class _EditableRowDialogColumns extends StatelessWidget {
       : super(key: key);
 
   final String name;
-  final String value;
+  final String? value;
 
   @override
   Widget build(BuildContext context) {

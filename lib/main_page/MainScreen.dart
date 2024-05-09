@@ -298,7 +298,7 @@ class HeaderDrawerItem extends StatelessWidget {
               CircleAvatar(
                   radius: 52,
                   backgroundImage: NetworkImage(
-                      'https://cdn3.iconfinder.com/data/icons/design-n-code/100/272127c4-8d19-4bd3-bd22-2b75ce94ccb4-512.png')),
+                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfkpE6EmYWUILYK6fnETfK4sD1PV1bvhVQS9ZpFlnwEw&s')),
               _UserDetails(),
             ],
           ),
