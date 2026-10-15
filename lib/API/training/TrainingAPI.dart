@@ -7,7 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TrainingAPI{
 
-  static const String _baseUrl = "http://173.212.201.249:8082/training";
+  static const String _baseUrl = "http://213.239.130.153:8082/training";
+  // static const String _baseUrl = "http://192.168.0.201:8082/training";
   final timeout = 8;
 
   Future<List<dynamic>> getAllTrainingDays() async {
@@ -18,7 +19,7 @@ class TrainingAPI{
     SharedPreferences prefs = await futurePrefs;
     String token = prefs.getString('token')!;
 
-    Options options = Options(headers: {"token":token});
+    Options options = Options(headers: {"Authorization": "Bearer $token"});
 
     try {
       Response response = await _dio.get(_baseUrl + "/getAll", options: options).timeout(Duration(seconds: timeout));
@@ -41,7 +42,7 @@ class TrainingAPI{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token')!;
 
-    Options options = Options(headers: {"token":token});
+    Options options = Options(headers: {"Authorization": "Bearer $token"});
 
     try {
       Response response = await _dio.get(_baseUrl + "/delete/$dayOfWeekNumber", options: options).timeout(Duration(seconds: timeout));
@@ -63,7 +64,7 @@ class TrainingAPI{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token')!;
 
-    Options options = Options(headers: {"token":token});
+    Options options = Options(headers: {"Authorization": "Bearer $token"});
 
     try {
       Response response = await _dio.get(_baseUrl + "/get/$dayOfWeekNumber", options: options).timeout(Duration(seconds: timeout));
@@ -88,7 +89,7 @@ class TrainingAPI{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token')!;
 
-    Options options = Options(headers: {"token":token, "Content-Type": "application/json"});
+    Options options = Options(headers: {"Authorization": "Bearer $token", "Content-Type": "application/json"});
 
     try {
       Response response = await _dio.post(_baseUrl + "/add", options: options, data: jsonEncode(workout.toJson())).timeout(Duration(seconds: timeout));

@@ -10,7 +10,8 @@ import 'model/UserDetails.dart';
 class UserAPI {
   late final Dio _dio;
 
-  static const String _baseUrl = "http://173.212.201.249:8083/user";
+  static const String _baseUrl = "http://213.239.130.153:8083/user";
+  // static const String _baseUrl = "http://192.168.0.201:8083/user";
   final timeout = 8;
 
   UserAPI() {
@@ -26,7 +27,7 @@ class UserAPI {
       'id': gymId,
     };
 
-    Options options = Options(headers: {"token": token});
+    Options options = Options(headers: {"Authorization": "Bearer $token"});
 
     try {
       Response response = await _dio
@@ -49,7 +50,7 @@ class UserAPI {
     SharedPreferences prefs = await futurePrefs;
     String token = prefs.getString('token')!;
 
-    Options options = Options(headers: {"token": token});
+    Options options = Options(headers: {"Authorization": "Bearer $token"});
 
     try {
       Response response = await _dio
@@ -72,7 +73,7 @@ class UserAPI {
     SharedPreferences prefs = await futurePrefs;
     String token = prefs.getString('token')!;
 
-    Options options = Options(headers: {"token": token});
+    Options options = Options(headers: {"Authorization": "Bearer $token"});
 
     Response response = await _dio.get(_baseUrl + "/favourites", options: options).timeout(Duration(seconds: timeout));
 
@@ -92,7 +93,7 @@ class UserAPI {
     SharedPreferences prefs = await futurePrefs;
     String token = prefs.getString('token')!;
 
-    Options options = Options(headers: {"token": token});
+    Options options = Options(headers: {"Authorization": "Bearer $token"});
 
     Response response = await _dio.get(_baseUrl + "/getUserInfo", options: options).timeout(Duration(seconds: timeout));
 
@@ -109,7 +110,7 @@ class UserAPI {
     SharedPreferences prefs = await futurePrefs;
     String token = prefs.getString('token')!;
 
-    Options options = Options(headers: {"token": token});
+    Options options = Options(headers: {"Authorization": "Bearer $token"});
 
     Response response = await _dio.get(_baseUrl + "/administratedGyms", options: options).timeout(Duration(seconds: timeout));
 

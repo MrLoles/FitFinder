@@ -75,6 +75,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void _registerUser(GlobalKey<FormState> formKey, TextEditingController login, TextEditingController email, TextEditingController password){
+
     if(formKey.currentState!.validate()) {
       showDialog(
         barrierDismissible: false,
@@ -84,10 +85,12 @@ class _RegisterPageState extends State<RegisterPage> {
         context: context,
       );
 
+
       final Future<int> registerStatus = new AuthService().register(login.text, email.text, password.text);
 
       registerStatus.then((result){
         Navigator.of(context).pop();
+        print(result);
         if(result == 201){
           _showSuccessDialog(context);
         } else if(result == 400){

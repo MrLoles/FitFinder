@@ -1,14 +1,24 @@
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 
 import 'model/Token.dart';
 import 'model/ValidateToken.dart';
 
 class AuthService {
-  static const String _baseUrl = "http://173.212.201.249:8080/user";
-  final timeout = 8;
+  static const String _baseUrl = "http://213.239.130.153:8080/user";
+  // static const String _baseUrl = "http://192.168.0.201:8080/user";
+  final timeout = 30;
 
   Future<String> login(String usernameOrEmail, String password) async {
     final _dio = Dio();
+
+    (_dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+      client.findProxy = (uri) {
+        return "PROXY 10.0.2.2:8000;";
+      };
+      return client;
+    };
+
     var data;
 
     if(usernameOrEmail.contains("@")){
@@ -22,6 +32,9 @@ class AuthService {
           .post(_baseUrl + "/login",
           data: data
       ).timeout(Duration(seconds: timeout));
+
+      print("Login status: ${response.statusCode}");
+      print("Login response body: ${response.data}");
 
       if (response.statusCode == 200) {
         return accessTokenFromJson(response.data).accessToken.toString();
@@ -51,6 +64,9 @@ class AuthService {
   }
 
   Future<int> register(String login, String email, String password) async {
+    print("TEST");
+    print(_baseUrl + "/register");
+
     final _dio = Dio();
     _dio.options.validateStatus = (status) {
       return status! >= 200 && status <= 400;

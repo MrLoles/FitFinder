@@ -12,7 +12,7 @@
             <data android:scheme="tel" />
         </intent>
         <intent>
-            <action android:name="android.intent.action.SEND" />
+            <action android:name="android.intent.action.SEND" />F
             <data android:mimeType="*/*" />
         </intent>
     </queries>
